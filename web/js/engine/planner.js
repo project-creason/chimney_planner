@@ -203,7 +203,7 @@ function planCeilingRoute(ctx) {
   if (!support) return;
   ctx.support = support;
   ctx.startElevationIn = ceiling.elevationIn;
-  plan.notes.push('Chimney length is measured from the ceiling plane at the support box. Confirm the starter-section position in the support box installation instructions.');
+  plan.notes.push('Chimney pipe length is measured from the ceiling plane at the support box. Confirm the starter-section position in the support box installation instructions.');
 
   const roofPen = spec.roof?.penetrationElevationIn;
   if (roofPen == null) { plan.fail('A through-the-ceiling chimney needs the roof elevation at the chimney.', ['roof.height']); return; }
@@ -774,7 +774,7 @@ function termination(ctx) {
   sel.pieces.forEach(p => plan.add(p, 1, 'Straight chimney run'));
   const topIn = ctx.startElevationIn + ctx.offsetRiseIn + sel.installedIn;
   const chimneyLenIn = topIn - ctx.startElevationIn;
-  plan.check('termination', topIn >= requiredTopIn - 1e-6, `Chimney top at ${ftIn(topIn)} meets the governing requirement: ${governing} (at least ${ftIn(requiredTopIn, true)}).`);
+  plan.check('termination', topIn >= requiredTopIn - 1e-6, `Top of the chimney at ${ftIn(topIn)} above the floor meets the governing requirement: ${governing} (at least ${ftIn(requiredTopIn, true)}).`);
   if (ctx.appliance.maxSystemHeightFt != null) {
     plan.check('appliance.max_system_height', topIn <= ctx.appliance.outletIn + ctx.appliance.maxSystemHeightFt * 12,
       `System height ${ft(topIn - ctx.appliance.outletIn)} ft vs. the ${ctx.appliance.label} manual maximum of ${ctx.appliance.maxSystemHeightFt} ft.`, ['appliance.maxHeight']);

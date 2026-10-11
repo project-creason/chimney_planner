@@ -158,9 +158,24 @@ input:hover, select:hover { border-color: var(--steel); }
 .banner.ok { border-color: var(--line); background: var(--sunken); }
 .banner.ok strong { color: var(--ok); }
 
-.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin: 0; }
-.figures div { background: var(--surface); padding: 9px 12px; min-width: 0; }
-.figures dt { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); margin: 0; }
+.figures .fig { background: var(--surface); padding: 9px 12px; min-width: 0; position: relative; }
+.figures .fig:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.figures .fig:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.figures dt { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.fig-info { flex: none; width: 16px; height: 16px; padding: 0; border: 1px solid var(--steel); border-radius: 50%; background: none;
+  color: var(--muted); font: italic 600 10px/14px Georgia, serif; text-transform: none; letter-spacing: 0; cursor: help; }
+.fig-info:hover, .fig-info:focus-visible { border-color: var(--accent); color: var(--accent); }
+/* the note: on hover, or on tap/keyboard focus of the (i) button (phones have no hover) */
+.fig-tip { display: none; position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; width: min(280px, 80vw); margin: 0;
+  padding: 9px 11px; background: var(--ink); color: var(--surface); border-radius: var(--radius); font-size: 12.5px; line-height: 1.45;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.18); pointer-events: none; }
+.fig:nth-child(n+3) .fig-tip { left: auto; right: 0; }
+@media (max-width: 700px) {   /* two tiles per row: left column opens right, right column opens left */
+  .fig:nth-child(odd) .fig-tip { left: 0; right: auto; }
+  .fig:nth-child(even) .fig-tip { left: auto; right: 0; }
+}
+.fig:hover .fig-tip, .fig:focus-within .fig-tip { display: block; }
 .figures dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .governing { margin: 0; font-size: 13.5px; color: var(--muted); }
 .governing b { color: var(--ink); font-weight: 600; }

@@ -387,6 +387,44 @@ function csvCell(v) {
   const t = String(v ?? '');
   return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
 }
+/**
+ * The four headline measurements, in the order people use them, each with a note on how it's measured.
+ * Shared by the results sheet and the CSV so they always agree.
+ */
+function figures(r, spec) {
+  const g = r.geometry;
+  const isFp = spec.appliance.type === 'FACTORY_FIREPLACE';
+  const rt = spec.route.type;
+  const from = rt === 'WALL' ? 'the tee outside the wall' : rt === 'FIREPLACE' ? 'the top of the fireplace' : 'the ceiling support box';
+  const out = [];
+  out.push({ label: 'Chimney Pipe Length', value: fmtFtIn(g.chimneyLengthIn),
+    note: `The total length of DuraTech chimney pipe when stacked, from ${from} to the top of the chimney` +
+      `${g.offsets?.length ? ', including the offset elbows' : ''}. Each section's 1¼" joint overlap is already taken off.` });
+  const manual = spec.appliance.minSystemHeightFt != null ? ` Your manual's minimum: ${spec.appliance.minSystemHeightFt} ft.` : '';
+  out.push({ label: 'Flue Collar to Top', value: fmtFtIn(g.systemHeightIn),
+    note: `From the top of the ${isFp ? 'fireplace' : 'stove'}'s flue collar to the top of the chimney: the height appliance manuals give their minimum in.${manual}` +
+      (isFp ? '' : ' It includes the stovepipe between the stove and the ceiling, but stovepipe parts are not in this parts list.') });
+  // the figure is measured where the planner measures the exit: roof at the pipe's center, chase top, or wall top
+  const pitch = spec.roof?.pitch ?? 0;
+  const outer = catalog?.sizes?.find(z => z.size === String(spec.appliance.collarSizeIn))?.outer_in;
+  if (g.exit === 'roof penetration') {
+    const highIn = outer ? (outer / 2) * pitch / 12 : 0;
+    out.push({ label: 'Above the Roof', value: fmtFtIn(g.aboveExitIn),
+      note: `Height of the chimney top above the roof, measured at the pipe's center.` +
+        (highIn > 0.05 ? ` The roof is ${fmtIn(highIn)} higher on the pipe's uphill (high) side, so it stands ${fmtFtIn(g.aboveExitIn - highIn)} above the roof there; the 3 ft rule is checked on that high side.` : '') });
+  } else if (g.exit === 'chase top') {
+    out.push({ label: 'Above the Chase', value: fmtFtIn(g.aboveExitIn),
+      note: 'Height of the chimney top above the top of the chase. The chase top is flat, so this is the same all the way around the pipe.' });
+  } else {
+    const wallTop = spec.route.wallTopElevationIn;
+    out.push({ label: 'Above the Wall', value: wallTop != null ? fmtFtIn(g.chimneyTopIn - wallTop) : '–',
+      note: 'Height of the chimney top above the top of the outside wall, where the last wall strap can go. The chimney doesn\'t pass through the roof here.' });
+  }
+  out.push({ label: 'Total Chimney Height', value: fmtFtIn(g.chimneyTopIn),
+    note: `The total height of the chimney including the ${isFp ? 'fireplace' : 'stove'}, measured from the floor to the top of the chimney pipe. The cap adds a few inches above that.` });
+  return out;
+}
+
 function partsCsv(r, spec) {
   const head = ['Qty', 'Part number', 'Stock number', 'Description', 'Section', 'Optional', 'Not a Duravent part', 'Flag', 'Why'];
   const rows = r.parts.map(p => [
@@ -395,9 +433,10 @@ function partsCsv(r, spec) {
     (p.flags || []).map(f => `${f.level}: ${f.text}`).join(' | '), p.reasons.join(' '),
   ]);
   const label = spec.appliance.label ? ` for ${spec.appliance.label}` : '';
-  const title = [`DuraTech ${spec.appliance.collarSizeIn}" chimney${label}`, `Chimney top ${fmtFtIn(r.geometry.chimneyTopIn)} above the floor`];
+  const title = [`DuraTech ${spec.appliance.collarSizeIn}" chimney${label}`];
+  const figs = figures(r, spec).map(f => [f.label, f.value, f.note].map(csvCell).join(','));
   // BOM so Excel reads ° and × correctly
-  return '\ufeff' + [title.map(csvCell).join(','), '', head.join(','), ...rows.map(row => row.map(csvCell).join(','))].join('\r\n') + '\r\n';
+  return '\ufeff' + [title.map(csvCell).join(','), ...figs, '', head.join(','), ...rows.map(row => row.map(csvCell).join(','))].join('\r\n') + '\r\n';
 }
 csvBtn.addEventListener('click', async () => {
   if (!lastResult?.ok) return;
@@ -539,16 +578,12 @@ function render(r, spec) {
   $('#partsArea').hidden = !r.ok;
   if (r.ok) {
     const g = r.geometry;
-    const exitName = g.exit === 'chase top' ? 'Above the chase' : g.exit ? 'Above the roof' : 'Above the wall top';
-    const aboveIn = g.aboveExitIn ?? (spec.route.type === 'WALL' && spec.route.wallTopElevationIn != null
-      ? g.chimneyTopIn - spec.route.wallTopElevationIn : null);
-    const figs = [
-      ['Chimney top', fmtFtIn(g.chimneyTopIn)],
-      [exitName, aboveIn != null ? fmtFtIn(aboveIn) : '–'],
-      ['Chimney length', fmtFtIn(g.chimneyLengthIn)],
-      ['Collar to top', fmtFtIn(g.systemHeightIn)],
-    ];
-    $('#figures').innerHTML = figs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    $('#figures').innerHTML = figures(r, spec).map((f, i) => `
+      <div class="fig">
+        <dt>${f.label}<button type="button" class="fig-info" aria-describedby="fig-tip-${i}" aria-label="About ${f.label}">i</button></dt>
+        <dd>${f.value}</dd>
+        <p class="fig-tip" id="fig-tip-${i}" role="tooltip">${esc(f.note)}</p>
+      </div>`).join('');
     $('#governing').innerHTML = `Height set by <b>${esc(g.governingRule)}</b>: at least ${fmtFtIn(g.requiredTopIn, true)} above the floor.`;
     const offs = g.offsets || [];
     $('#offsetInfo').hidden = !offs.length;
