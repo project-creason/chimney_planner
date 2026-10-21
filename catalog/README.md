@@ -20,8 +20,10 @@ catalog/
     product_lines.csv          DT, DB, DVL ... status ACTIVE | PLANNED | RETIRED
     categories.csv             functional part types, shared across lines
     attribute_defs.csv         line-specific extra attributes and their types
-    rules.csv                  manufacturer, code and industry-practice (INDUSTRY) rules; scope = GLOBAL or a line code
+    rule_defs.csv              every rule key: LIMIT (with MIN/MAX/EXACT direction), REQUIREMENT or ADVICE, and engine_uses
+    rules.csv                  manufacturer, code and industry-practice (INDUSTRY) rules; scope = GLOBAL, a manufacturer or a line code
     line_compatibility.csv     which lines connect to which, and through which categories
+  logos/                       manufacturer logos named in manufacturers.csv (logo_file)
   lines/<LINE>/                one folder per product line
     sizes.csv                  sizes the line comes in (size key, flue, outer diameter)
     parts.csv                  one row per orderable SKU
@@ -41,7 +43,17 @@ catalog/
 4. Anything that doesn't fit a `parts.csv` column becomes an attribute: define it once in
    `attribute_defs.csv`, then set values in the line's `attributes.csv`.
 5. Record how it connects to other lines in `line_compatibility.csv`.
-6. Flip status to `ACTIVE`. Only active lines are compiled and validated as complete.
+6. Give the line a value for every rule in `rule_defs.csv` with `engine_uses` = 1 (scope = the line or its
+   manufacturer; GLOBAL rows already count). The build lists any that are missing.
+7. Flip status to `ACTIVE`. Only active lines are compiled and validated as complete.
+
+## Rules
+
+Rule keys are generic (`offset.max_count`, not `dt.max_offsets`) so the planner works with any manufacturer.
+The same key can have rows for several scopes. For a LIMIT the strictest applies (highest MIN, lowest MAX);
+otherwise the most specific scope wins (line, then manufacturer, then GLOBAL).
+
+Pick parts by attributes, never by order number or description text: for example `cap_style` and `trim_style`.
 
 ## Editing conventions
 
