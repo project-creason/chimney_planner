@@ -6,3 +6,5 @@ roof_surface,enum,METAL_CORRUGATED|METAL_OR_TILE,,ROOF_FLASHING,Roof surface a s
 max_pitch_by_size,map,,pitch,ROOF_FLASHING,"Per-size pitch limit overriding pitch_max, as size:pitch"
 interior_only,bool,,,CHIMNEY_PIPE,Painted section intended for interior use only
 also_fits_sizes,text,,in,SNOW_SPLITTER,Sizes outside this product line the part also fits
+cap_style,enum,STANDARD|DIKAPT,,CAP,Cap design; absent = STANDARD
+trim_style,enum,ROUND|SQUARE,,TRIM_COLLAR_ROUND_BOX,Shape of the trim collar's outer edge

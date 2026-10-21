@@ -510,3 +510,24 @@ test('thimble needing an extension carries a caution on its row', () => {
   const r = planChimney(EXAMPLE_THROUGH_WALL, cat);
   assert.equal(r.parts.find(p => p.order_number === '6DT-WT').flags[0].level, 'CAUTION');
 });
+
+// ------------------------------------------------------------------ rule resolution
+test('a rule set by several sources resolves to the strictest value', async () => {
+  const { strictest } = await import('../web/js/engine/catalog.js');
+  const rank = r => ({ DT: 3, DURAVENT: 2, GLOBAL: 1 })[r.scope];
+  const rows = [{ scope: 'GLOBAL', value: 2 }, { scope: 'DT', value: 3 }, { scope: 'DURAVENT', value: 1 }];
+  assert.equal(strictest(rows, { direction: 'MIN' }, rank).value, 3);
+  assert.equal(strictest(rows, { direction: 'MAX' }, rank).value, 1);
+  assert.equal(strictest(rows, { kind: 'ADVICE' }, rank).scope, 'DT');
+});
+
+test('a stricter global rule overrides the manufacturer, and other lines are ignored', () => {
+  const index = load('index.json'), line = load('DT.json');
+  const extra = { ...index, rules: [...index.rules,
+    { key: 'term.min_above_penetration_ft', authority: 'LOCAL', scope: 'GLOBAL', value: 4, statement: 'Local: 4 ft' },
+    { key: 'offset.max_count', authority: 'MANUFACTURER', scope: 'OTHER_LINE', value: 0, statement: 'not this line' }] };
+  const c = makeCatalog(extra, line);
+  assert.equal(c.rule('term.min_above_penetration_ft').value, 4);
+  assert.equal(c.rule('offset.max_count').value, 2);
+  assert.equal(c.manufacturer.name, 'Duravent');
+});

@@ -19,7 +19,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -209,7 +209,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -399,7 +399,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -589,7 +589,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -811,7 +811,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -1033,7 +1033,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -1240,7 +1240,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -1431,7 +1431,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -1622,7 +1622,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -1813,7 +1813,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -2036,7 +2036,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -2259,7 +2259,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -2465,7 +2465,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -2655,7 +2655,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -2845,7 +2845,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -3035,7 +3035,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -3257,7 +3257,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -3479,7 +3479,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -3701,7 +3701,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -3891,7 +3891,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -4081,7 +4081,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -4271,7 +4271,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -4493,7 +4493,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -4715,7 +4715,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -4937,7 +4937,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -5127,7 +5127,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -5317,7 +5317,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -5507,7 +5507,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -5729,7 +5729,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -5935,7 +5935,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -6157,7 +6157,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -6347,7 +6347,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -6537,7 +6537,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -6727,7 +6727,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -6949,7 +6949,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -7155,7 +7155,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -7377,7 +7377,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -7567,7 +7567,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -7757,7 +7757,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -7947,7 +7947,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -8169,7 +8169,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -8375,7 +8375,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -8597,7 +8597,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -8787,7 +8787,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -8977,7 +8977,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -9167,7 +9167,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -9389,7 +9389,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -9595,7 +9595,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -9817,7 +9817,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -10007,7 +10007,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -10197,7 +10197,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -10387,7 +10387,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -10606,7 +10606,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic shield requirement met by the support box collar."
     },
@@ -10885,7 +10885,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -11090,7 +11090,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -11295,7 +11295,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -11500,7 +11500,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -11705,7 +11705,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -11910,7 +11910,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -12137,7 +12137,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -12326,7 +12326,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -12515,7 +12515,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -12705,7 +12705,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -12895,7 +12895,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -13101,7 +13101,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -13323,7 +13323,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -13497,7 +13497,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -13687,7 +13687,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -13893,7 +13893,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -14083,7 +14083,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -14289,7 +14289,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -18725,7 +18725,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -18976,7 +18976,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -19260,7 +19260,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -19546,7 +19546,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -19834,7 +19834,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -20118,7 +20118,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -20407,7 +20407,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -20445,7 +20445,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -20483,7 +20483,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -20518,7 +20518,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -20805,7 +20805,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -21083,7 +21083,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -21363,7 +21363,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -21646,7 +21646,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -21924,7 +21924,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -22205,7 +22205,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -22493,7 +22493,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -22777,7 +22777,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -23063,7 +23063,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -23336,7 +23336,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -23604,7 +23604,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -23875,7 +23875,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -24153,7 +24153,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -24186,7 +24186,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -24457,7 +24457,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -24729,7 +24729,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -24997,7 +24997,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -25267,7 +25267,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -25544,7 +25544,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -25578,7 +25578,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -25847,7 +25847,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -26142,7 +26142,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -26180,7 +26180,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -26215,7 +26215,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -26492,7 +26492,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -26525,7 +26525,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -26795,7 +26795,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -27078,7 +27078,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -27112,7 +27112,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -27386,7 +27386,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -27424,7 +27424,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -27462,7 +27462,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -27497,7 +27497,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -27780,7 +27780,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -27813,7 +27813,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -28092,7 +28092,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -28126,7 +28126,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -28399,7 +28399,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -28695,7 +28695,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -28782,7 +28782,7 @@
    ],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     }
@@ -28817,7 +28817,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -29123,7 +29123,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -29433,7 +29433,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -29706,7 +29706,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -29976,7 +29976,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -30166,7 +30166,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -30356,7 +30356,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -30546,7 +30546,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -30736,7 +30736,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -30942,7 +30942,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -31148,7 +31148,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -31354,7 +31354,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -31560,7 +31560,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -31766,7 +31766,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -31972,7 +31972,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -32178,7 +32178,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -32384,7 +32384,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -32606,7 +32606,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -32828,7 +32828,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -33050,7 +33050,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -33272,7 +33272,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -33498,7 +33498,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -33753,7 +33753,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -33947,7 +33947,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -34217,7 +34217,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -34443,7 +34443,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -34699,7 +34699,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -34922,7 +34922,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -35182,7 +35182,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic shield requirement met by the support box collar."
     },
@@ -35356,7 +35356,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -35545,7 +35545,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic shield requirement met by the support box collar."
     },
@@ -35719,7 +35719,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -35930,7 +35930,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -36173,7 +36173,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -36416,7 +36416,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -36627,7 +36627,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -36842,7 +36842,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -50937,7 +50937,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -51190,7 +51190,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -51443,7 +51443,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -51678,7 +51678,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -51929,7 +51929,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -52180,7 +52180,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -52415,7 +52415,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -52666,7 +52666,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -52917,7 +52917,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -53152,7 +53152,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -53403,7 +53403,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },
@@ -53654,7 +53654,7 @@
    "errorFields": [],
    "checks": [
     {
-     "rule": "dt.attic_shield_required",
+     "rule": "attic.shield_required",
      "status": "PASS",
      "detail": "Attic insulation shield added."
     },

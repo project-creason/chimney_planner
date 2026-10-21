@@ -1,7 +1,7 @@
 /**
  * Chimney planner: ChimneySpec + catalog -> parts list, rule checks, warnings.
  *
- * Pure function, no DOM, no network. Duravent and code numbers come from the catalog
+ * Pure function, no DOM, no network. Manufacturer and code numbers come from the catalog
  * (rules.csv / parts.csv); the appliance's own limits come from spec.appliance, which the
  * user fills in from their stove or fireplace manual. Geometry is in geometry.js.
  * Where sources overlap, the strictest wins: highest minimum, lowest maximum.
@@ -108,7 +108,7 @@ export function planChimney(spec, cat) {
   }
   if (spec.size == null && m.collarSizeIn == null) { plan.fail('Need the flue collar size from the appliance.', ['appliance.collar']); return plan.result(); }
   if (spec.size != null && m.collarSizeIn != null && Number(spec.size) !== Number(m.collarSizeIn)) {
-    plan.fail(`A ${spec.size}" chimney doesn't match the ${m.collarSizeIn}" flue collar. ${cat.rule('dt.diameter_match_appliance').statement}`, ['appliance.collar']);
+    plan.fail(`A ${spec.size}" chimney doesn't match the ${m.collarSizeIn}" flue collar. ${cat.rule('flue.diameter_match_appliance').statement}`, ['appliance.collar']);
     return plan.result();
   }
   const size = String(spec.size ?? m.collarSizeIn);
@@ -126,7 +126,8 @@ export function planChimney(spec, cat) {
     spec, cat, plan, size, finish, outerIn: sizeRow.outer_in, stock: pipeStock(cat, size, finish),
     usesTee: false, offsets: 0, offsetRiseIn: 0,
     exit: null,                       // {elevationIn, pitch, label} where the chimney leaves the building
-    maxOffsets: cat.rule('dt.max_offsets').value, offsetAngles: [15, 30],
+    maxOffsets: cat.rule('offset.max_count').value,
+    offsetAngles: [...new Set((cat.lookups.elbow_offsets || []).map(r => r.angle_deg))].sort((a, b) => a - b),
     appliance: null,                  // stove or fireplace whose own manual adds limits
     offsetAnglesUsed: [], offsetsUsed: [], horizontalRunIn: 0,
     lateralSupportsIn: null,          // elevations that hold the chimney sideways (chase runs)
@@ -138,7 +139,7 @@ export function planChimney(spec, cat) {
     plan.notes.push(`At ${spec.siteElevationFt} ft, the site is below ${ctx.altitudeThresholdFt.toLocaleString('en-US')} ft, so no high-altitude allowance is made.`);
   }
 
-  plan.notes.push(`Maintain at least ${cat.rule('dt.clearance_to_combustibles_in').value}" air space to combustibles along the entire chimney.`);
+  plan.notes.push(`Maintain at least ${cat.rule('clearance.combustibles_in').value}" air space to combustibles along the entire chimney.`);
   const route = spec.route?.type;
   if (!readManual(ctx)) return plan.result();
   const roofGiven = spec.roof?.penetrationElevationIn != null || spec.roof?.elevationAtChimneyIn != null;
@@ -153,11 +154,11 @@ export function planChimney(spec, cat) {
 
   if (!plan.errors.length && ctx.appliance.requiresRoofRadiationShield) {
     const rrs = plan.pick('ROOF_RADIATION_SHIELD', size, () => true, 'roof radiation shield');
-    if (rrs) plan.add(rrs, 1, `Required by the ${ctx.appliance.label} manual. ${cat.rule('dt.roof_radiation_shield_per_appliance').statement}`);
+    if (rrs) plan.add(rrs, 1, `Required by the ${ctx.appliance.label} manual. ${cat.rule('roof.radiation_shield_per_appliance').statement}`);
   }
   if (!plan.errors.length) termination(ctx);
   if (!plan.errors.length) draftCheck(ctx);
-  plan.notes.push(cat.rule('dt.inspection_recommended').statement);
+  plan.notes.push(cat.rule('general.inspection_recommended').statement);
   return plan.result();
 }
 
@@ -193,7 +194,7 @@ function planCeilingRoute(ctx) {
     } else if (choice === 'ROUND') {
       support = plan.pick('CEILING_SUPPORT_ROUND', size, () => true, 'round ceiling support box');
       const wantRound = (ceiling.roundTrim || 'ROUND') === 'ROUND';
-      const trim = plan.pick('TRIM_COLLAR_ROUND_BOX', size, p => /-TCR-/.test(p.order_number) === wantRound, 'trim collar for the round support box');
+      const trim = plan.pick('TRIM_COLLAR_ROUND_BOX', size, p => (attr(p, 'trim_style') === 'ROUND') === wantRound, 'trim collar for the round support box');
       if (trim) plan.add(trim, 1, 'Covers the gap between the round support box and the ceiling cut-out (sold separately)');
     } else if (choice === 'FLAT_UNPAINTED') {
       support = plan.pick('CEILING_SUPPORT_FLAT', size, () => true, 'unpainted flat ceiling support box');
@@ -216,7 +217,7 @@ function planCeilingRoute(ctx) {
   if (roofPen <= ceiling.elevationIn) { plan.fail('The roof must be above the ceiling support box.', ['roof.height', 'ceiling.height']); return; }
   if (!floorShields(ctx, floorPenetrationsIn, roofPen, 'FIRESTOP')) return;
   if (spec.route.throughLivingSpace) {
-    plan.issue('CAUTION', 'The chimney passes through a second-floor room. Enclose it there (a framed chase or boxed-in wall) with the 2" air space kept, so it is protected from contact and storage; check the DuraTech installation instructions and local code for the enclosure requirement.');
+    plan.issue('CAUTION', `The chimney passes through a second-floor room. Enclose it there (a framed chase or boxed-in wall) with the 2" air space kept, so it is protected from contact and storage; check the ${cat.line.name} installation instructions and local code for the enclosure requirement.`);
   }
   atticShield(ctx, atticAbove, attr(support, 'functions_as_attic_shield') && floorPenetrationsIn.length === 0, 'support box collar');
   // the support box sits above the ceiling, so open space starts at its top
@@ -281,13 +282,13 @@ function atticShield(ctx, atticAbove, alreadyMet, byWhat) {
   const { cat, plan, size } = ctx;
   if (!atticAbove) return;
   if (alreadyMet) {
-    plan.checks.push({ rule: 'dt.attic_shield_required', status: 'PASS', detail: `Attic shield requirement met by the ${byWhat}.` });
+    plan.checks.push({ rule: 'attic.shield_required', status: 'PASS', detail: `Attic shield requirement met by the ${byWhat}.` });
     return;
   }
   const s = plan.pick('ATTIC_SHIELD', size, () => true, 'attic insulation shield');
   if (s) {
-    plan.add(s, 1, cat.rule('dt.attic_shield_required').statement);
-    plan.checks.push({ rule: 'dt.attic_shield_required', status: 'PASS', detail: 'Attic insulation shield added.' });
+    plan.add(s, 1, cat.rule('attic.shield_required').statement);
+    plan.checks.push({ rule: 'attic.shield_required', status: 'PASS', detail: 'Attic insulation shield added.' });
   }
 }
 
@@ -408,7 +409,7 @@ function planOffsets(ctx, offsets, spaces = []) {
       plan.warnings.push(`Offset ${n} needs ${inch(row.rise_in)} of vertical room with ${row.angle_deg}° elbows. Check it fits where the jog happens, or enter the height available so the planner can check.`);
     }
     if (row.offset_in > o.horizontalIn + 1e-9) {
-      plan.issue('CAUTION', `Offset ${n}: Duravent's elbow chart has no ${inch(o.horizontalIn)} shift; the nearest larger one, ${inch(row.offset_in)}, is used. ` +
+      plan.issue('CAUTION', `Offset ${n}: ${cat.manufacturer.name}'s elbow chart has no ${inch(o.horizontalIn)} shift; the nearest larger one, ${inch(row.offset_in)}, is used. ` +
         `Lay out the roof opening for a ${inch(row.offset_in)} shift.`, [kit?.order_number].filter(Boolean));
     }
   });
@@ -437,7 +438,7 @@ function planWallRoute(ctx) {
   const trim = cat.parts('WALL_THIMBLE_TRIM', size)[0];
   if (trim && w.cladding === 'VINYL') plan.add(trim, 1, 'Optional stainless exterior trim; finishes the opening on siding');
 
-  const projection = cat.rule('dt.wall_thimble_interior_projection_in').value;
+  const projection = cat.rule('wall.thimble_interior_projection_in').value;
   const horizNeed = projection + w.wallThicknessIn + standoff;
   ctx.horizontalRunIn = (w.collarToWallIn ?? projection) + w.wallThicknessIn + standoff;
   wallApplianceChecks(ctx);
@@ -456,7 +457,7 @@ function planWallRoute(ctx) {
   ctx.support = ts;
   ctx.startElevationIn = w.thimbleCenterElevationIn + (tee.dimensions?.E?.value_in ?? 0) / 2;
   plan.notes.push('Vertical pipe is measured from the top of the tee (assumed centred on the thimble); confirm with the tee installation instructions.');
-  plan.warnings.push(cat.rule('dt.interior_preferred').statement);
+  plan.warnings.push(cat.rule('route.interior_preferred').statement);
 
   if (w.exit?.type === 'CHASE') {
     if (w.exit.chaseTopElevationIn == null) { plan.fail(ENTER_CHASE_TOP, ['chase.top']); return; }
@@ -489,7 +490,7 @@ function planFireplaceRoute(ctx) {
     if (!ap) return;
     plan.add(ap, 1, `Attaches the chimney to the top of the ${fp.label}`);
     if (fp.connection === 'ANCHOR_PLATE_DAMPER') {
-      plan.issue('CAUTION', 'The fireplace calls for an anchor plate with damper, which is not in this catalog; the standard anchor plate is listed as a placeholder. Order the damper version from Duravent.', [ap.order_number]);
+      plan.issue('CAUTION', `The fireplace calls for an anchor plate with damper, which is not in this catalog; the standard anchor plate is listed as a placeholder. Order the damper version from ${cat.manufacturer.name}.`, [ap.order_number]);
     }
   }
   ctx.startElevationIn = fp.outletIn;
@@ -517,7 +518,7 @@ function planFireplaceRoute(ctx) {
   }
   const floors = r.floorPenetrationsIn || [];
   if (!floorShields(ctx, floors, exitElev, shieldKind)) return;
-  if (shieldKind === 'PASS_THROUGH' && floors.length) plan.notes.push(cat.rule('dt.pass_through_shield_above_fireplace').statement);
+  if (shieldKind === 'PASS_THROUGH' && floors.length) plan.notes.push(cat.rule('ceiling.pass_through_shield_above_fireplace').statement);
   atticShield(ctx, !!r.atticAbove, floors.length > 0 && !!attr(ctx.lastShield, 'functions_as_attic_shield'), 'pass-through shield top');
   if (r.atticAbove && !floors.length) plan.warnings.push('An attic above the fireplace implies at least one ceiling penetration; add its elevation so a shield is included.');
 
@@ -572,7 +573,7 @@ function readManual(ctx) {
         plan.errors.push(`Factory-built fireplaces are listed with specific chimneys. Check that the fireplace manual allows ${cat.line.name} (or any ${UL103HT} chimney) before planning.`);
         return false;
       }
-      plan.warnings.push(`Confirm the ${label} manual accepts a ${UL103HT} listed chimney such as ${cat.line.name}. ${cat.rule('dt.appliance_must_approve_chimney').statement}`);
+      plan.warnings.push(`Confirm the ${label} manual accepts a ${UL103HT} listed chimney such as ${cat.line.name}. ${cat.rule('appliance.must_approve_chimney').statement}`);
   }
   if (m.maxOffsets != null && m.maxOffsets < ctx.maxOffsets) { ctx.maxOffsets = m.maxOffsets; ctx.maxOffsetsSource = `${label} manual`; }
   if (m.offsetAnglesDeg?.length) ctx.offsetAngles = [15, 30].filter(a => m.offsetAnglesDeg.includes(a));
@@ -676,7 +677,7 @@ function chaseTop(ctx, exit) {
   if (w && d && covers && (w > covers || d > covers)) {
     const custom = {
       order_number: 'CUSTOM-CHASE-COVER', stock_number: null, category: 'CHASE_TOP_FLASHING', nonCatalog: true,
-      description: `Custom chase cover, ${fmt(w)} × ${fmt(d)}, ${fmt(hole)} chimney hole (not a Duravent part)`,
+      description: `Custom chase cover, ${fmt(w)} × ${fmt(d)}, ${fmt(hole)} chimney hole (not a ${cat.manufacturer.name} part)`,
     };
     plan.add(custom, 1, 'Closes the top of the chase; made by a sheet-metal shop to the chase size');
     plan.issue('CAUTION',
@@ -687,12 +688,12 @@ function chaseTop(ctx, exit) {
     plan.add(ctf, 1, 'Closes the top of the chase around the chimney; spacer clips vent the chase');
     if (!w || !d) plan.notes.push(`${ctf.order_number} covers a chase top up to ${fmt(covers)} × ${fmt(covers)}. Enter the chase size to check yours.`);
   }
-  plan.add(sc, 1, cat.rule('dt.chase_top_needs_storm_collar').statement + ' Seal with 500°F non-hardening sealant.');
+  plan.add(sc, 1, cat.rule('chase.storm_collar_required').statement + ' Seal with 500°F non-hardening sealant.');
   if (exit.airIntake) {
     const ai = plan.pick('CHASE_AIR_INTAKE', size, () => true, 'chase air intake');
     if (ai) plan.add(ai, 1, 'Requested: lets ventilation air into the chase; screen keeps rodents out');
   } else plan.notes.push('If the appliance or local code requires chase ventilation air, add the chase air intake (6DT-CAI).');
-  if (exit.shroud) plan.issue('CAUTION', cat.rule('dt.shroud_spec_l157').statement);
+  if (exit.shroud) plan.issue('CAUTION', cat.rule('termination.shroud_spec').statement);
   if (spec.roof?.penetrationElevationIn == null && spec.roof?.elevationAtChimneyIn == null && !(spec.nearbyWithin10ft || []).length) {
     plan.issue('CAUTION', 'No roof height or nearby structure was given, so the 2 ft / 10 ft rule could not be checked; the height only clears the chase top. Enter the roof height beside the chase in Roof Information (4).');
   }
@@ -702,7 +703,7 @@ function chaseTop(ctx, exit) {
 }
 
 /**
- * How far the chimney must rise above the chase top. The user picks the rule; Duravent's 6"
+ * How far the chimney must rise above the chase top. The user picks the rule; the manufacturer's 6"
  * from the chase top flashing to the bottom of the cap applies under every rule and is never undercut.
  *   CODE   - the chase top is treated as the roof: 3 ft above it (3-2-10).
  *   TWO_FT - the chase is part of the building within 10 ft: 2 ft above it.
@@ -711,8 +712,8 @@ function chaseTop(ctx, exit) {
  */
 function chaseTopRule(ctx, exit) {
   const { cat, plan } = ctx;
-  const capIn = cat.rule('dt.chase_top_min_cap_clearance_in').value;
-  const capCheck = { label: `${capIn}" from the chase top flashing to the bottom of the cap (Duravent minimum)`, aboveIn: capIn };
+  const capIn = cat.rule('chase.min_cap_clearance_in').value;
+  const capCheck = { label: `${capIn}" from the chase top flashing to the bottom of the cap (${cat.manufacturer.name} minimum)`, aboveIn: capIn };
   const rule = exit.topRule || 'CODE';
   if (rule === 'SET') {
     const v = exit.aboveChaseIn;
@@ -721,7 +722,7 @@ function chaseTopRule(ctx, exit) {
       return [capCheck];
     }
     if (v < capIn) {
-      plan.fail(`${inTxt(v)} above the chase top is less than Duravent's minimum of ${capIn}" from the chase top flashing to the bottom of the cap. ` +
+      plan.fail(`${inTxt(v)} above the chase top is less than ${cat.manufacturer.name}'s minimum of ${capIn}" from the chase top flashing to the bottom of the cap. ` +
         `Enter ${capIn}" or more in Chase Information (2b).`, ['chase.above']);
       return [capCheck];
     }
@@ -751,7 +752,7 @@ function roofPenetration(ctx) {
   plan.add(flashing, 1, `Weatherproofs the ${p12}/12 ${words(surface)} roof penetration`);
   if (flashing.order_number !== 'URBAK') {   // rubber boot kit includes its own storm collar
     const sc = plan.pick('STORM_COLLAR', size, () => true, 'storm collar');
-    if (sc) plan.add(sc, 1, cat.rule('dt.storm_collar_with_flashing').statement + ' Seal with 500°F non-hardening sealant.');
+    if (sc) plan.add(sc, 1, cat.rule('roof.storm_collar_with_flashing').statement + ' Seal with 500°F non-hardening sealant.');
   }
   ctx.exit = { elevationIn: spec.roof.penetrationElevationIn, pitch, label: 'roof penetration' };
 }
@@ -788,7 +789,7 @@ function termination(ctx) {
   }
 
   // lateral support: wall straps
-  const strapIntervalIn = cat.rule('dt.wall_strap_interval_ft').value * 12;
+  const strapIntervalIn = cat.rule('wall.strap_interval_ft').value * 12;
   const strapFinish = cat.parts('WALL_STRAP_ADJ', size).some(p => p.finish === ctx.finish) ? ctx.finish : 'SS';
   const addStraps = (n, why) => {
     if (n <= 0) return;
@@ -799,28 +800,28 @@ function termination(ctx) {
   if (spec.route.type === 'WALL') {
     const wallTop = Math.min(spec.route.wallTopElevationIn, ctx.exit?.elevationIn ?? Infinity, topIn);
     const run = wallTop - ctx.startElevationIn;
-    if (run > 0) addStraps(Math.ceil(run / strapIntervalIn), `${cat.rule('dt.wall_strap_interval_ft').statement} (${ft(run)} ft of wall run)`);
+    if (run > 0) addStraps(Math.ceil(run / strapIntervalIn), `${cat.rule('wall.strap_interval_ft').statement} (${ft(run)} ft of wall run)`);
     braceFromIn = ctx.exit?.elevationIn ?? wallTop;
   } else if (ctx.lateralSupportsIn) {
     const s = ctx.lateralSupportsIn;
     let n = 0;
     for (let i = 1; i < s.length; i++) n += Math.max(0, Math.ceil((s[i] - s[i - 1]) / strapIntervalIn) - 1);
-    addStraps(n, `Keeps unsupported spans inside the chase to ${cat.rule('dt.wall_strap_interval_ft').value} ft or less; fasten to chase framing`);
+    addStraps(n, `Keeps unsupported spans inside the chase to ${cat.rule('wall.strap_interval_ft').value} ft or less; fasten to chase framing`);
   }
 
   // above-roof bracing
   const freeIn = topIn - braceFromIn;
-  const threshold = cat.rule('dt.roof_bracket_threshold_ft').value * 12;
-  const interval = cat.rule('dt.roof_bracket_interval_ft').value * 12;
+  const threshold = cat.rule('roof.bracket_threshold_ft').value * 12;
+  const interval = cat.rule('roof.bracket_interval_ft').value * 12;
   if (freeIn >= threshold) {
     const n = 1 + Math.floor((freeIn - threshold) / interval);
     const br = plan.pick('EXT_ROOF_BRACKET', size, () => true, 'extended roof bracket');
-    if (br) plan.add(br, n, `${ft(freeIn)} ft of chimney stands above its last roof, chase or wall support. ${cat.rule('dt.roof_bracket_threshold_ft').statement}`);
+    if (br) plan.add(br, n, `${ft(freeIn)} ft of chimney stands above its last roof, chase or wall support. ${cat.rule('roof.bracket_threshold_ft').statement}`);
   }
 
   // cap and options
   const o = spec.options || {};
-  const capPart = plan.pick('CAP', size, p => (o.cap === 'DIKAPT') === /DIKAPT/.test(p.description), 'chimney cap');
+  const capPart = plan.pick('CAP', size, p => (o.cap || 'STANDARD') === (attr(p, 'cap_style') || 'STANDARD'), 'chimney cap');
   if (capPart) plan.add(capPart, 1, 'Keeps precipitation out; removable for inspection');
   if (o.sparkArrestor) { const sa = plan.pick('SPARK_ARRESTOR', size, () => true, 'spark arrestor'); if (sa) plan.add(sa, 1, 'Requested: keeps embers in and animals out'); }
   if (o.lockingBands) {
