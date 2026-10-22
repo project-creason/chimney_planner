@@ -168,3 +168,9 @@ function* fireplace() {
 }
 
 export const SCENARIOS = [...ranch(), ...wall(), ...fireplace(), ['Boston 1200', clone(BOSTON_1200)]];
+
+/** Lines whose plans for every scenario are recorded, and where. DuraTech keeps its original file name. */
+export const GOLDEN_LINES = ['DT', 'XL'];
+export const goldenFile = line => (line === 'DT' ? 'golden-plans.json' : `golden-plans-${line}.json`);
+/** A scenario's spec for a line: the same answers, that line's parts. DuraTech specs are used exactly as written. */
+export const specFor = (spec, line) => (line === 'DT' ? spec : { ...spec, line });

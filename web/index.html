@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>DuraTech Chimney Planner</title>
+<title>Chimney Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -44,7 +44,7 @@
 }
 
 * { box-sizing: border-box; }
-[hidden] { display: none !important; }   /* conditional fields: beats .field/.grid display rules */
+[hidden], [data-line-off] { display: none !important; }   /* data-line-off: the chosen product line doesn't offer it */   /* conditional fields: beats .field/.grid display rules */
 body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
 h1, h2, h3, legend { font-family: var(--font-display); text-wrap: balance; }
 button, input, select { font: inherit; color: inherit; }
@@ -58,6 +58,11 @@ button, input, select { font: inherit; color: inherit; }
 .brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .brand h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: 0.01em; line-height: 1; }
 .brand h1 span { color: var(--accent); }
+.brand h1 b { font-weight: inherit; }
+.line-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.line-pick label { font-weight: 600; }
+.line-pick select { max-width: 100%; }
+.line-pick .hint { flex-basis: 100%; margin: 0; }
 .brand p { margin: 0; color: var(--muted); font-size: 13px; }
 .btn {
   border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius);
@@ -292,8 +297,8 @@ svg [hidden] { display: none; }
 
 <header class="top">
   <div class="brand">
-    <h1>Duravent <span>DuraTech</span> chimney planner</h1>
-    <p>5"–8" all-fuel chimney · parts from catalog DV_DT_CT-001E (Aug 2026)</p>
+    <h1><b id="lineMaker">Duravent</b> <span id="lineName">DuraTech</span> chimney planner</h1>
+    <p>5"–8" all-fuel chimney<span id="lineSource"> · parts from catalog DV_DT_CT-001E (2026-08)</span></p>
   </div>
   <div class="head-btns">
     <button class="btn" type="button" id="themeToggle" aria-pressed="false">Dark mode</button>
@@ -306,6 +311,11 @@ svg [hidden] { display: none; }
   <form class="form" id="q" novalidate>
     <div class="example" id="exampleNote">
       <span>These answers are an example: a one-story ranch with a wood stove. Replace them with your own measurements.</span>
+    </div>
+    <div class="line-pick" id="linePick" hidden>
+      <label for="chimney-line">Chimney system</label>
+      <select id="chimney-line" name="chimney.line"></select>
+      <p class="hint">Switching keeps your measurements; the parts and the maker's rules change to the system you pick.</p>
     </div>
     <div class="measure-rules">
       <b>How to measure</b>
@@ -362,7 +372,7 @@ svg [hidden] { display: none; }
             <span class="manual-count" id="manualCount"></span>
           </summary>
           <div class="manual-body">
-          <p>Look in the venting or chimney section of the installation manual. Leave anything blank that the manual doesn't state. Where the manual and Duravent differ, the planner uses the stricter value.</p>
+          <p>Look in the venting or chimney section of the installation manual. Leave anything blank that the manual doesn't state. Where the manual and <span data-fill="maker">Duravent</span> differ, the planner uses the stricter value.</p>
           <div class="grid">
             <div class="field">
               <label for="appliance-minHeightFt">Minimum chimney height</label>
@@ -385,7 +395,7 @@ svg [hidden] { display: none; }
               <select id="appliance-maxOffsets" name="appliance.maxOffsets">
                 <option value="">Not stated</option><option value="0">None</option><option value="1">1</option><option value="2">2</option>
               </select>
-              <p class="hint">An offset is a pair of elbows around framing. DuraTech allows 2.</p>
+              <p class="hint">An offset is a pair of elbows around framing. <span data-fill="line">DuraTech</span> allows <span data-fill="maxOffsets">2</span>.</p>
             </div>
             <div class="field" data-when="appliance.kind=STOVE">
               <label for="appliance-minRiseIn">Vertical rise before a horizontal run</label>
@@ -434,13 +444,13 @@ svg [hidden] { display: none; }
             <div class="field" data-when="ceiling.style=FLAT">
               <label for="ceiling-support">Ceiling support</label>
               <select id="ceiling-support" name="ceiling.support">
-                <option value="SQUARE">Square support box</option>
-                <option value="SQUARE_COLLAR">Square box with attic collar (6" only)</option>
-                <option value="ROUND">Round support box</option>
-                <option value="FLAT_UNPAINTED">Unpainted box (mechanical room)</option>
+                <option value="SQUARE" data-needs="CEILING_SUPPORT_SQUARE">Square support box</option>
+                <option value="SQUARE_COLLAR" data-needs="CEILING_SUPPORT_SQUARE_COLLAR">Square box with attic collar (6" only)</option>
+                <option value="ROUND" data-needs="CEILING_SUPPORT_ROUND">Round support box</option>
+                <option value="FLAT_UNPAINTED" data-needs="CEILING_SUPPORT_FLAT">Unpainted box (mechanical room)</option>
               </select>
             </div>
-            <div class="field" data-when="ceiling.style=FLAT;ceiling.support=ROUND">
+            <div class="field" data-when="ceiling.style=FLAT;ceiling.support=ROUND" data-needs="TRIM_COLLAR_ROUND_BOX">
               <label for="ceiling-roundTrim">Trim collar</label>
               <select id="ceiling-roundTrim" name="ceiling.roundTrim"><option value="ROUND">Round</option><option value="SQUARE">Square</option></select>
             </div>
@@ -485,7 +495,7 @@ svg [hidden] { display: none; }
               <label><input type="radio" name="ceiling.jog" id="ceiling-jog-straight" value="STRAIGHT"><span>Straight up</span></label>
               <label><input type="radio" name="ceiling.jog" id="ceiling-jog-offset" value="OFFSET"><span>It needs an offset</span></label>
             </div>
-            <p class="hint">An offset is a pair of elbows that shifts the chimney sideways to clear a joist, rafter or ridge beam. DuraTech allows up to 2. The shifts listed are the ones Duravent's elbow chart makes, so pick the one at or just above the shift you need; a smaller shift than the chart's smallest can't be built.</p>
+            <p class="hint">An offset is a pair of elbows that shifts the chimney sideways to clear a joist, rafter or ridge beam. <span data-fill="line">DuraTech</span> allows up to <span data-fill="maxOffsets">2</span>. The shifts listed are the ones <span data-fill="maker">Duravent</span>'s elbow chart makes, so pick the one at or just above the shift you need; a smaller shift than the chart's smallest can't be built.</p>
             <div class="offsets" data-when="ceiling.jog=OFFSET">
               <div class="rows" data-list="ceiling.offsets" data-kind="offset"></div>
               <p class="hint">Height available is the vertical room where the jog happens, for example from the top of the ceiling joists to the underside of the rafters. With Auto, the planner uses 15° elbows if they fit and 30° if not. The line under each offset shows the shift, the height it takes and what's left over.</p>
@@ -511,7 +521,7 @@ svg [hidden] { display: none; }
             </div>
             <div class="field">
               <label for="wall-thimble">Wall thimble</label>
-              <select id="wall-thimble" name="wall.thimble"><option value="STANDARD">Standard</option><option value="INSULATED">Insulated</option></select>
+              <select id="wall-thimble" name="wall.thimble"><option value="STANDARD">Standard</option><option value="INSULATED" data-needs="WALL_THIMBLE_INSULATED">Insulated</option></select>
             </div>
             <div class="field">
               <label for="wall-centerFt">Center of the wall opening, above the floor</label>
@@ -568,7 +578,7 @@ svg [hidden] { display: none; }
               <label for="fireplace-shield">Shield at each floor or ceiling</label>
               <select id="fireplace-shield" name="fireplace.shield">
                 <option value="FIRESTOP">Firestop radiation shield</option>
-                <option value="PASS_THROUGH">Pass-through radiation shield (6"–8")</option>
+                <option value="PASS_THROUGH" data-needs="PASS_THROUGH_SHIELD">Pass-through radiation shield (6"–8")</option>
               </select>
             </div>
           </div>
@@ -579,7 +589,7 @@ svg [hidden] { display: none; }
               <label><input type="radio" name="fireplace.jog" id="fireplace-jog-straight" value="STRAIGHT"><span>Straight up</span></label>
               <label><input type="radio" name="fireplace.jog" id="fireplace-jog-offset" value="OFFSET"><span>It needs an offset</span></label>
             </div>
-            <p class="hint">An offset is a pair of elbows that shifts the chimney sideways to clear framing in the chase or a rafter. DuraTech allows up to 2. The shifts listed are the ones Duravent's elbow chart makes, so pick the one at or just above the shift you need; a smaller shift than the chart's smallest can't be built.</p>
+            <p class="hint">An offset is a pair of elbows that shifts the chimney sideways to clear framing in the chase or a rafter. <span data-fill="line">DuraTech</span> allows up to <span data-fill="maxOffsets">2</span>. The shifts listed are the ones <span data-fill="maker">Duravent</span>'s elbow chart makes, so pick the one at or just above the shift you need; a smaller shift than the chart's smallest can't be built.</p>
             <div class="offsets" data-when="fireplace.jog=OFFSET">
               <div class="rows" data-list="fireplace.offsets" data-kind="offset"></div>
               <p class="hint">Height available is the vertical room where the jog happens, for example from the top of the ceiling joists to the underside of the rafters. With Auto, the planner uses 15° elbows if they fit and 30° if not. The line under each offset shows the shift, the height it takes and what's left over.</p>
@@ -618,16 +628,16 @@ svg [hidden] { display: none; }
             <div class="withunit"><input type="number" id="chase-depthIn" name="chase.depthIn" min="0" step="0.25" inputmode="decimal"><span class="unit">in</span></div>
           </div>
         </div>
-        <p class="hint">Duravent's chase top flashing is a square of about 18¾" to 21¾", depending on chimney size. A bigger chase needs a cover made by a sheet-metal shop; the parts list will say so.</p>
+        <p class="hint" id="chaseFlashingHint">Duravent's chase top flashing is a square of about 18¾" to 21¾", depending on chimney size. A bigger chase needs a cover made by a sheet-metal shop; the parts list will say so.</p>
         <div class="grid">
           <div class="field">
             <label for="chase-topRule">How high the chimney goes above the chase top</label>
             <select id="chase-topRule" name="chase.topRule">
               <option value="CODE">3 ft above the chase top (3-2-10 rule)</option>
               <option value="TWO_FT">2 ft above the chase top</option>
-              <option value="SET">A height I set (6" minimum)</option>
+              <option value="SET" id="chaseSetOption">A height I set (6" minimum)</option>
             </select>
-            <p class="hint">Use what your inspector or plans call for. Duravent requires at least 6" from the chase top flashing to the bottom of the cap under every choice, and the roof and anything within 10 ft are always checked too.</p>
+            <p class="hint">Use what your inspector or plans call for. <span data-fill="maker">Duravent</span> requires at least <span data-fill="chaseMinIn">6"</span> between the chase top and the cap under every choice, and the roof and anything within 10 ft are always checked too.</p>
           </div>
           <div class="field" data-when="chase.topRule=SET">
             <label for="chase-aboveIn">Chase top to bottom of the cap</label>
@@ -635,7 +645,7 @@ svg [hidden] { display: none; }
             <p class="hint">6" or more. The planner rounds up to whole pipe sections, never down.</p>
           </div>
         </div>
-        <label class="check"><input type="checkbox" id="chase-airIntake" name="chase.airIntake"> Add a chase air intake</label>
+        <label class="check" data-needs="CHASE_AIR_INTAKE"><input type="checkbox" id="chase-airIntake" name="chase.airIntake"> Add a chase air intake</label>
         <label class="check"><input type="checkbox" id="chase-shroud" name="chase.shroud"> A decorative shroud will cover the top</label>
       </div>
     </fieldset>
@@ -813,7 +823,7 @@ svg [hidden] { display: none; }
             <label for="chimney-finish">Outer wall</label>
             <select id="chimney-finish" name="chimney.finish"><option value="SS">Stainless steel</option><option value="GA">Galvalume (6"–8")</option></select>
           </div>
-          <div class="field">
+          <div class="field" id="connectorField">
             <label for="chimney-connector">Stovepipe below the ceiling</label>
             <select id="chimney-connector" name="chimney.connector"><option value="DB">DuraBlack single-wall</option><option value="DVL">DVL double-wall</option></select>
             <p class="hint">Sets the cathedral support box height.</p>
@@ -829,8 +839,8 @@ svg [hidden] { display: none; }
             <select id="chimney-cap" name="chimney.cap"><option value="STANDARD">Standard cap</option><option value="DIKAPT">DIKAPT anti-downdraft cap</option></select>
           </div>
         </div>
-        <label class="check"><input type="checkbox" id="chimney-sparkArrestor" name="chimney.sparkArrestor"> Add a spark arrestor</label>
-        <label class="check"><input type="checkbox" id="chimney-lockingBands" name="chimney.lockingBands"> Add locking bands at every joint (optional)</label>
+        <label class="check" data-needs="SPARK_ARRESTOR"><input type="checkbox" id="chimney-sparkArrestor" name="chimney.sparkArrestor"> Add a spark arrestor</label>
+        <label class="check" data-needs="LOCKING_BAND"><input type="checkbox" id="chimney-lockingBands" name="chimney.lockingBands"> Add locking bands at every joint (optional)</label>
       </div>
     </fieldset>
   </form>
@@ -862,7 +872,7 @@ svg [hidden] { display: none; }
       <div id="warnBlock" hidden><h3>Check these</h3><ul class="list" id="warnings"></ul></div>
       <div id="noteBlock" hidden><h3>Installation notes</h3><ul class="list notes" id="notes"></ul></div>
       <details id="checkBlock" hidden><summary>Rules applied</summary><ul class="checks" id="checks"></ul></details>
-      <p class="fine">A planning aid, not an installation approval. Follow the Duravent installation instructions and your appliance manual, check local code, and have the finished chimney inspected by a certified professional.</p>
+      <p class="fine">A planning aid, not an installation approval. Follow the <span data-fill="maker">Duravent</span> installation instructions and your appliance manual, check local code, and have the finished chimney inspected by a certified professional.</p>
     </div>
   </aside>
 </main>

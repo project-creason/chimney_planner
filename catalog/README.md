@@ -30,8 +30,9 @@ catalog/
     dimensions.csv             lettered drawing dimensions (A, B, C ...)
     adjustability.csv          per-size min/max for universal straps and supports
     attributes.csv             values for attribute_defs keys
-    elbow_offsets.csv          optional lookup table
-    support_box_pitch.csv      optional lookup table
+    elbow_offsets.csv          optional lookup table; an optional size column gives a chart per size
+    support_box_pitch.csv      optional lookup table; connector_line ANY = one height for every stovepipe
+    support_projection.csv     optional: how far the ceiling support hangs below the ceiling, by pitch
 ```
 
 ## Adding a new product line
@@ -46,6 +47,22 @@ catalog/
 6. Give the line a value for every rule in `rule_defs.csv` with `engine_uses` = 1 (scope = the line or its
    manufacturer; GLOBAL rows already count). The build lists any that are missing.
 7. Flip status to `ACTIVE`. Only active lines are compiled and validated as complete.
+8. Record its plans: `node tools/make_golden.mjs <CODE>`, add the code to `GOLDEN_LINES` in
+   `tests/fixtures/scenarios.mjs`, and write a few tests of its own (see `tests/excel.test.mjs`).
+
+The planner never names a manufacturer. Where makers package or install things differently, say so in the data:
+
+| Difference | How to record it |
+|---|---|
+| Elbows sold one at a time instead of as a kit | category `ELBOW` (the planner orders two per offset) instead of `ELBOW_KIT` |
+| A support needed above each offset | rule `offset.resupport_above_each` = 1 and an `OFFSET_SUPPORT` part |
+| A requirement that doesn't apply to this line | a rule row for the line with value `0` (requirements only) |
+| A figure the maker doesn't publish | leave the value blank (only the draft guideline and roof-bracket spacing allow it) |
+| Flashing that ships with its storm collar | attribute `includes_storm_collar` = 1 |
+| Support box or firestop that is the attic shield once a storm collar covers it | `functions_as_attic_shield` = 1 and `attic_seal_category` (`STORM_COLLAR` or `STORM_COLLAR_SQUARE`) |
+| One part rated for several sizes | attribute `max_supported_ft_by_size`, e.g. `5:50\|6:44` |
+| One part doing two jobs (a wall support that is also the wall band) | attribute `also_categories` |
+| No chase top flashing | leave the category out; the plan lists a shop-made cover, plus the line's `CHASE_VENT_CONE` if it has one |
 
 ## Rules
 

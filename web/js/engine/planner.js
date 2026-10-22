@@ -300,7 +300,7 @@ function atticShield(ctx, atticAbove, alreadyMet, byWhat, byPart = null) {
     if (seal) {
       const sc = plan.pick(seal, size, () => true, 'storm collar');
       if (!sc) return;
-      plan.add(sc, 1, `Closes the top of the ${byWhat} so loose insulation can't fall in; with it, the ${byWhat} is the attic insulation shield. ${cat.rule('attic.shield_required').statement}`);
+      plan.add(sc, 1, `Closes the top of the ${byWhat} so loose insulation can't fall in; with it, the ${byWhat} is the attic insulation shield`);
     }
     plan.checks.push({ rule: 'attic.shield_required', status: 'PASS', detail: `Attic shield requirement met by the ${byWhat}${seal ? ' with a storm collar on top' : ''}.` });
     return;

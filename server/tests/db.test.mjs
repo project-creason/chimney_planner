@@ -61,7 +61,7 @@ test('a line missing a rule the engine needs is refused', async () => {
 
 test('every recorded scenario plans identically from the database', async t => {
   const { index, lines } = await readCatalog(await freshDb());
-  assert.equal(compareAll(makeCatalog(index, lines.DT), t), 0);
+  for (const line of ['DT', 'XL']) assert.equal(compareAll(makeCatalog(index, lines[line]), t, line), 0, line);
 });
 
 test('API: lines with manufacturer, plans, and errors', async () => {

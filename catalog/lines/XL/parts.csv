@@ -1,0 +1,181 @@
+order_number,stock_number,category,description,sizes,finish,carton_filler,nominal_length_in,adjustable_min_in,adjustable_max_in,elbow_angle_deg,pitch_min,pitch_max,pitch_applies_to,height_in,max_supported_ft,max_supported_with_straps_ft,wall_min_in,wall_max_in,wall_max_extended_in,standoff_min_in,standoff_max_in,optional,active,source_page,note
+5EL48,,CHIMNEY_PIPE,"5"" EXCEL insulated length 48""",5,SS,0,48,,,,,,,,,,,,,,,0,1,10,
+5EL36,,CHIMNEY_PIPE,"5"" EXCEL insulated length 36""",5,SS,0,36,,,,,,,,,,,,,,,0,1,10,
+5EL24,,CHIMNEY_PIPE,"5"" EXCEL insulated length 24""",5,SS,0,24,,,,,,,,,,,,,,,0,1,10,
+5EL18,,CHIMNEY_PIPE,"5"" EXCEL insulated length 18""",5,SS,0,18,,,,,,,,,,,,,,,0,1,10,
+5EL12,,CHIMNEY_PIPE,"5"" EXCEL insulated length 12""",5,SS,0,12,,,,,,,,,,,,,,,0,1,10,
+5EL6,,CHIMNEY_PIPE,"5"" EXCEL insulated length 6""",5,SS,0,6,,,,,,,,,,,,,,,0,1,10,
+6EL48,,CHIMNEY_PIPE,"6"" EXCEL insulated length 48""",6,SS,0,48,,,,,,,,,,,,,,,0,1,10,
+6EL36,,CHIMNEY_PIPE,"6"" EXCEL insulated length 36""",6,SS,0,36,,,,,,,,,,,,,,,0,1,10,
+6EL24,,CHIMNEY_PIPE,"6"" EXCEL insulated length 24""",6,SS,0,24,,,,,,,,,,,,,,,0,1,10,
+6EL18,,CHIMNEY_PIPE,"6"" EXCEL insulated length 18""",6,SS,0,18,,,,,,,,,,,,,,,0,1,10,
+6EL12,,CHIMNEY_PIPE,"6"" EXCEL insulated length 12""",6,SS,0,12,,,,,,,,,,,,,,,0,1,10,
+6EL6,,CHIMNEY_PIPE,"6"" EXCEL insulated length 6""",6,SS,0,6,,,,,,,,,,,,,,,0,1,10,
+7EL48,,CHIMNEY_PIPE,"7"" EXCEL insulated length 48""",7,SS,0,48,,,,,,,,,,,,,,,0,1,10,
+7EL36,,CHIMNEY_PIPE,"7"" EXCEL insulated length 36""",7,SS,0,36,,,,,,,,,,,,,,,0,1,10,
+7EL24,,CHIMNEY_PIPE,"7"" EXCEL insulated length 24""",7,SS,0,24,,,,,,,,,,,,,,,0,1,10,
+7EL18,,CHIMNEY_PIPE,"7"" EXCEL insulated length 18""",7,SS,0,18,,,,,,,,,,,,,,,0,1,10,
+7EL12,,CHIMNEY_PIPE,"7"" EXCEL insulated length 12""",7,SS,0,12,,,,,,,,,,,,,,,0,1,10,
+7EL6,,CHIMNEY_PIPE,"7"" EXCEL insulated length 6""",7,SS,0,6,,,,,,,,,,,,,,,0,1,10,
+8EL48,,CHIMNEY_PIPE,"8"" EXCEL insulated length 48""",8,SS,0,48,,,,,,,,,,,,,,,0,1,10,
+8EL36,,CHIMNEY_PIPE,"8"" EXCEL insulated length 36""",8,SS,0,36,,,,,,,,,,,,,,,0,1,10,
+8EL24,,CHIMNEY_PIPE,"8"" EXCEL insulated length 24""",8,SS,0,24,,,,,,,,,,,,,,,0,1,10,
+8EL18,,CHIMNEY_PIPE,"8"" EXCEL insulated length 18""",8,SS,0,18,,,,,,,,,,,,,,,0,1,10,
+8EL12,,CHIMNEY_PIPE,"8"" EXCEL insulated length 12""",8,SS,0,12,,,,,,,,,,,,,,,0,1,10,
+8EL6,,CHIMNEY_PIPE,"8"" EXCEL insulated length 6""",8,SS,0,6,,,,,,,,,,,,,,,0,1,10,
+5ELA18,,ADJUSTABLE_PIPE,"5"" EXCEL insulated adjustable length, 9 1/2""-16 1/4"" installed",5,SS,0,,9.5,16.25,,,,,,,,,,,,,1,1,10,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Not used by the planner yet: offsets use the fixed-length table."
+6ELA18,,ADJUSTABLE_PIPE,"6"" EXCEL insulated adjustable length, 9 1/2""-16 1/4"" installed",6,SS,0,,9.5,16.25,,,,,,,,,,,,,1,1,10,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Not used by the planner yet: offsets use the fixed-length table."
+7ELA18,,ADJUSTABLE_PIPE,"7"" EXCEL insulated adjustable length, 9 1/2""-16 1/4"" installed",7,SS,0,,9.5,16.25,,,,,,,,,,,,,1,1,10,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Not used by the planner yet: offsets use the fixed-length table."
+8ELA18,,ADJUSTABLE_PIPE,"8"" EXCEL insulated adjustable length, 9 1/2""-16 1/4"" installed",8,SS,0,,9.5,16.25,,,,,,,,,,,,,1,1,10,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Not used by the planner yet: offsets use the fixed-length table."
+5ETI,,TEE,"5"" EXCEL insulated tee with tee cap (ETC)",5,SS,0,,,,,,,,11.25,,,,,,,,0,1,10,
+6ETI,,TEE,"6"" EXCEL insulated tee with tee cap (ETC)",6,SS,0,,,,,,,,12.25,,,,,,,,0,1,10,
+7ETI,,TEE,"7"" EXCEL insulated tee with tee cap (ETC)",7,SS,0,,,,,,,,13.25,,,,,,,,0,1,10,
+8ETI,,TEE,"8"" EXCEL insulated tee with tee cap (ETC)",8,SS,0,,,,,,,,14.25,,,,,,,,0,1,10,
+5EE15,,ELBOW,"5"" EXCEL insulated 15° elbow",5,SS,0,,,,15,,,,,,,,,,,,0,1,11,
+5EE30,,ELBOW,"5"" EXCEL insulated 30° elbow",5,SS,0,,,,30,,,,,,,,,,,,0,1,11,
+6EE15,,ELBOW,"6"" EXCEL insulated 15° elbow",6,SS,0,,,,15,,,,,,,,,,,,0,1,11,
+6EE30,,ELBOW,"6"" EXCEL insulated 30° elbow",6,SS,0,,,,30,,,,,,,,,,,,0,1,11,
+7EE15,,ELBOW,"7"" EXCEL insulated 15° elbow",7,SS,0,,,,15,,,,,,,,,,,,0,1,11,
+7EE30,,ELBOW,"7"" EXCEL insulated 30° elbow",7,SS,0,,,,30,,,,,,,,,,,,0,1,11,
+8EE15,,ELBOW,"8"" EXCEL insulated 15° elbow",8,SS,0,,,,15,,,,,,,,,,,,0,1,11,
+8EE30,,ELBOW,"8"" EXCEL insulated 30° elbow",8,SS,0,,,,30,,,,,,,,,,,,0,1,11,
+EWS,,TEE_SUPPORT,EXCEL wall support (universal band),5|6|7|8,,0,,,,,,,,,,,,,,2,,0,1,11,"Catalog lists one code that fits 6""-8"" on a universal band; manual p.23 says the 5"" band fits 5"" only. Confirm the 5"" order code with ICC. Rated heights per size are on catalog p.8."
+EWSE,,WALL_SUPPORT_EXT,"EXCEL extended wall support, passes a 12"" overhang",5|6|7|8,,0,,,,,,,,,,,,,,,,1,1,11,"Catalog lists one code that fits 6""-8"" on a universal band; manual p.23 says the 5"" band fits 5"" only. Confirm the 5"" order code with ICC."
+EOS,,OFFSET_SUPPORT,"EXCEL offset support (universal band, 24"" straps)",5|6|7|8,,0,,,,,,,,,,,,,,,,0,1,11,"Catalog lists one code that fits 6""-8"" on a universal band; manual p.23 says the 5"" band fits 5"" only. Confirm the 5"" order code with ICC."
+ESR,,ROOF_SUPPORT,"EXCEL roof support (universal band), flat to 24/12",5|6|7|8,,0,,,,,,,,,,,,,,,,0,1,11,"Catalog lists one code that fits 6""-8"" on a universal band; manual p.23 says the 5"" band fits 5"" only. Confirm the 5"" order code with ICC."
+5ERDS,,CEILING_SUPPORT_ROUND,"5"" EXCEL round support",5,,0,,,,,,,,24,65,,,,,,,0,1,12,Catalog shows the ERDTR finish trim with the support and the manual (p.8) has you fit the finish collar; the planner takes it as included. Storm collar ordered separately.
+6ERDS,,CEILING_SUPPORT_ROUND,"6"" EXCEL round support",6,,0,,,,,,,,24,55,,,,,,,0,1,12,Catalog shows the ERDTR finish trim with the support and the manual (p.8) has you fit the finish collar; the planner takes it as included. Storm collar ordered separately.
+7ERDS,,CEILING_SUPPORT_ROUND,"7"" EXCEL round support",7,,0,,,,,,,,24,50,,,,,,,0,1,12,Catalog shows the ERDTR finish trim with the support and the manual (p.8) has you fit the finish collar; the planner takes it as included. Storm collar ordered separately.
+8ERDS,,CEILING_SUPPORT_ROUND,"8"" EXCEL round support",8,,0,,,,,,,,24,45,,,,,,,0,1,12,Catalog shows the ERDTR finish trim with the support and the manual (p.8) has you fit the finish collar; the planner takes it as included. Storm collar ordered separately.
+6ERDSI,,CEILING_SUPPORT_ROUND,"6"" EXCEL insulated round support (sealed vapour barrier homes)",6,,0,,,,,,,,24,55,,,,,,,1,1,12,
+7ERDSI,,CEILING_SUPPORT_ROUND,"7"" EXCEL insulated round support (sealed vapour barrier homes)",7,,0,,,,,,,,24,50,,,,,,,1,1,12,
+8ERDSI,,CEILING_SUPPORT_ROUND,"8"" EXCEL insulated round support (sealed vapour barrier homes)",8,,0,,,,,,,,24,45,,,,,,,1,1,12,
+6ESS,,CEILING_SUPPORT_SQUARE,"6"" EXCEL square support with finish trim",6,,0,,,,,,,,24,55,,,,,,,0,1,12,Storm collar (ESQSC) ordered separately.
+7ESS,,CEILING_SUPPORT_SQUARE,"7"" EXCEL square support with finish trim",7,,0,,,,,,,,24,50,,,,,,,0,1,12,Storm collar (ESQSC) ordered separately.
+8ESS,,CEILING_SUPPORT_SQUARE,"8"" EXCEL square support with finish trim",8,,0,,,,,,,,24,45,,,,,,,0,1,12,Storm collar (ESQSC) ordered separately.
+5ERS,,FIRESTOP,"5"" EXCEL radiation shield (floors, ceilings and attic floor)",5,,0,,,,,,,,,,,,,,,,0,1,18,Storm collar (ESC) ordered separately; needed on top when the shield is in an insulated attic.
+6ERS,,FIRESTOP,"6"" EXCEL radiation shield (floors, ceilings and attic floor)",6,,0,,,,,,,,,,,,,,,,0,1,18,Storm collar (ESC) ordered separately; needed on top when the shield is in an insulated attic.
+7ERS,,FIRESTOP,"7"" EXCEL radiation shield (floors, ceilings and attic floor)",7,,0,,,,,,,,,,,,,,,,0,1,18,Storm collar (ESC) ordered separately; needed on top when the shield is in an insulated attic.
+8ERS,,FIRESTOP,"8"" EXCEL radiation shield (floors, ceilings and attic floor)",8,,0,,,,,,,,,,,,,,,,0,1,18,Storm collar (ESC) ordered separately; needed on top when the shield is in an insulated attic.
+6ERSC,,FIRESTOP,"6"" EXCEL radiation shield for cathedral ceiling",6,,0,,,,,,,,,,,,,,,,1,1,18,
+7ERSC,,FIRESTOP,"7"" EXCEL radiation shield for cathedral ceiling",7,,0,,,,,,,,,,,,,,,,1,1,18,
+8ERSC,,FIRESTOP,"8"" EXCEL radiation shield for cathedral ceiling",8,,0,,,,,,,,,,,,,,,,1,1,18,
+ESC,,STORM_COLLAR,"EXCEL universal storm collar, 6""-8""",6|7|8,,0,,,,,,,,,,,,,,,,0,1,18,
+TM-SC,,STORM_COLLAR,"Storm collar for 5"" EXCEL (EXCELDirect storm collar)",5,,0,,,,,,,,,,,,,,,,0,1,18,"Catalog p.18: for 5"" EXCEL use the EXCELDirect storm collar (TM-SC). Confirm the order code with ICC."
+6ESQSC,,STORM_COLLAR_SQUARE,"6"" EXCEL square support storm collar",6,,0,,,,,,,,,,,,,,,,0,1,18,
+7ESQSC,,STORM_COLLAR_SQUARE,"7"" EXCEL square support storm collar",7,,0,,,,,,,,,,,,,,,,0,1,18,
+8ESQSC,,STORM_COLLAR_SQUARE,"8"" EXCEL square support storm collar",8,,0,,,,,,,,,,,,,,,,0,1,18,
+5EWRS,,WALL_THIMBLE,"5"" EXCEL wall radiation shield, walls 6""-12""",5,,0,,,,,,,,,,,6,12,,,,0,1,13,
+6EWRS,,WALL_THIMBLE,"6"" EXCEL wall radiation shield, walls 6""-12""",6,,0,,,,,,,,,,,6,12,,,,0,1,13,
+7EWRS,,WALL_THIMBLE,"7"" EXCEL wall radiation shield, walls 6""-12""",7,,0,,,,,,,,,,,6,12,,,,0,1,13,
+8EWRS,,WALL_THIMBLE,"8"" EXCEL wall radiation shield, walls 6""-12""",8,,0,,,,,,,,,,,6,12,,,,0,1,13,
+6EWRSI,,WALL_THIMBLE_INSULATED,"6"" EXCEL insulated wall radiation shield, walls 6""-12""",6,,0,,,,,,,,,,,6,12,,,,0,1,13,
+7EWRSI,,WALL_THIMBLE_INSULATED,"7"" EXCEL insulated wall radiation shield, walls 6""-12""",7,,0,,,,,,,,,,,6,12,,,,0,1,13,
+8EWRSI,,WALL_THIMBLE_INSULATED,"8"" EXCEL insulated wall radiation shield, walls 6""-12""",8,,0,,,,,,,,,,,6,12,,,,0,1,13,
+6EST,,WALL_THIMBLE_TRIM,"6"" stainless trim for the EWRS exterior plate",6,SS,0,,,,,,,,,,,,,,,,1,1,13,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7EST,,WALL_THIMBLE_TRIM,"7"" stainless trim for the EWRS exterior plate",7,SS,0,,,,,,,,,,,,,,,,1,1,13,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8EST,,WALL_THIMBLE_TRIM,"8"" stainless trim for the EWRS exterior plate",8,SS,0,,,,,,,,,,,,,,,,1,1,13,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6ERRS,,ROOF_RADIATION_SHIELD,"6"" EXCEL roof radiation shield",6,,0,,,,,,,,,,,,,,,,0,1,18,
+7ERRS,,ROOF_RADIATION_SHIELD,"7"" EXCEL roof radiation shield",7,,0,,,,,,,,,,,,,,,,0,1,18,
+8ERRS,,ROOF_RADIATION_SHIELD,"8"" EXCEL roof radiation shield",8,,0,,,,,,,,,,,,,,,,0,1,18,
+5EAP,,ANCHOR_PLATE,"5"" EXCEL anchor plate",5,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6EAP,,ANCHOR_PLATE,"6"" EXCEL anchor plate",6,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7EAP,,ANCHOR_PLATE,"7"" EXCEL anchor plate",7,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8EAP,,ANCHOR_PLATE,"8"" EXCEL anchor plate",8,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6EAPD,,ANCHOR_PLATE,"6"" EXCEL anchor plate damper",6,,0,,,,,,,,,,,,,,,,1,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7EAPD,,ANCHOR_PLATE,"7"" EXCEL anchor plate damper",7,,0,,,,,,,,,,,,,,,,1,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8EAPD,,ANCHOR_PLATE,"8"" EXCEL anchor plate damper",8,,0,,,,,,,,,,,,,,,,1,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+5ELB,,LOCKING_BAND,"5"" EXCEL locking band",5,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Sizes not stated."
+6ELB,,LOCKING_BAND,"6"" EXCEL locking band",6,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Sizes not stated."
+7ELB,,LOCKING_BAND,"7"" EXCEL locking band",7,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Sizes not stated."
+8ELB,,LOCKING_BAND,"8"" EXCEL locking band",8,,0,,,,,,,,,,,,,,,,0,1,14,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code. Sizes not stated."
+ERB,,EXT_ROOF_BRACKET,"EXCEL roof brace, arms telescope 5-9 ft",5|6|7|8,,0,,,,,,,,,,,,,,,,0,1,15,"Catalog lists one code that fits 6""-8"" on a universal band; manual p.23 says the 5"" band fits 5"" only. Confirm the 5"" order code with ICC."
+ESRB,,EXT_ROOF_BRACKET,"EXCEL roof brace, stainless poles",5|6|7|8,,0,,,,,,,,,,,,,,,,1,1,15,"Catalog lists one code that fits 6""-8"" on a universal band; manual p.23 says the 5"" band fits 5"" only. Confirm the 5"" order code with ICC."
+ESW,,SNOW_SPLITTER,"EXCEL snow wedge, 4/12-12/12 roofs",5|6|7|8,,0,,,,,,,,,,,,,,,,1,1,15,Sizes not stated.
+5ERC,,CAP,"5"" EXCEL rain cap",5,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6ERC,,CAP,"6"" EXCEL rain cap",6,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7ERC,,CAP,"7"" EXCEL rain cap",7,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8ERC,,CAP,"8"" EXCEL rain cap",8,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+5EDRC,,CAP,"5"" EXCEL deluxe rain cap",5,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6EDRC,,CAP,"6"" EXCEL deluxe rain cap",6,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7EDRC,,CAP,"7"" EXCEL deluxe rain cap",7,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8EDRC,,CAP,"8"" EXCEL deluxe rain cap",8,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+5ERRC,,CAP,"5"" EXCEL revolving rain cap",5,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6ERRC,,CAP,"6"" EXCEL revolving rain cap",6,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7ERRC,,CAP,"7"" EXCEL revolving rain cap",7,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8ERRC,,CAP,"8"" EXCEL revolving rain cap",8,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+5ERCS,,SPARK_ARRESTOR,"5"" EXCEL spark screen for rain cap",5,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+6ERCS,,SPARK_ARRESTOR,"6"" EXCEL spark screen for rain cap",6,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7ERCS,,SPARK_ARRESTOR,"7"" EXCEL spark screen for rain cap",7,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8ERCS,,SPARK_ARRESTOR,"8"" EXCEL spark screen for rain cap",8,SS,0,,,,,,,,,,,,,,,,0,1,15,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+5EF,,ROOF_FLASHING,"5"" EXCEL flat flashing 0/12-2/12, galvalume, with storm collar",5,GA,0,,,,,0,2,roof,,,,,,,,,0,1,16,
+6EF,,ROOF_FLASHING,"6"" EXCEL flat flashing 0/12-2/12, galvalume, with storm collar",6,GA,0,,,,,0,2,roof,,,,,,,,,0,1,16,
+7EF,,ROOF_FLASHING,"7"" EXCEL flat flashing 0/12-2/12, galvalume, with storm collar",7,GA,0,,,,,0,2,roof,,,,,,,,,0,1,16,
+8EF,,ROOF_FLASHING,"8"" EXCEL flat flashing 0/12-2/12, galvalume, with storm collar",8,GA,0,,,,,0,2,roof,,,,,,,,,0,1,16,
+5EFA,,ROOF_FLASHING,"5"" EXCEL adjustable flashing 1/12-7/12, galvalume, with storm collar",5,GA,0,,,,,1,7,roof,,,,,,,,,0,1,16,
+6EFA,,ROOF_FLASHING,"6"" EXCEL adjustable flashing 1/12-7/12, galvalume, with storm collar",6,GA,0,,,,,1,7,roof,,,,,,,,,0,1,16,
+7EFA,,ROOF_FLASHING,"7"" EXCEL adjustable flashing 1/12-7/12, galvalume, with storm collar",7,GA,0,,,,,1,7,roof,,,,,,,,,0,1,16,
+8EFA,,ROOF_FLASHING,"8"" EXCEL adjustable flashing 1/12-7/12, galvalume, with storm collar",8,GA,0,,,,,1,7,roof,,,,,,,,,0,1,16,
+5EFB,,ROOF_FLASHING,"5"" EXCEL adjustable flashing 8/12-12/12, galvalume, with storm collar",5,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+6EFB,,ROOF_FLASHING,"6"" EXCEL adjustable flashing 8/12-12/12, galvalume, with storm collar",6,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+7EFB,,ROOF_FLASHING,"7"" EXCEL adjustable flashing 8/12-12/12, galvalume, with storm collar",7,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+8EFB,,ROOF_FLASHING,"8"" EXCEL adjustable flashing 8/12-12/12, galvalume, with storm collar",8,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+5EFC,,ROOF_FLASHING,"5"" EXCEL adjustable flashing 12/12-21/12, galvalume, with storm collar",5,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+6EFC,,ROOF_FLASHING,"6"" EXCEL adjustable flashing 12/12-21/12, galvalume, with storm collar",6,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+7EFC,,ROOF_FLASHING,"7"" EXCEL adjustable flashing 12/12-21/12, galvalume, with storm collar",7,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+8EFC,,ROOF_FLASHING,"8"" EXCEL adjustable flashing 12/12-21/12, galvalume, with storm collar",8,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+5ESF,,ROOF_FLASHING,"5"" EXCEL flat flashing 0/12-2/12, stainless, with storm collar",5,SS,0,,,,,0,2,roof,,,,,,,,,1,1,16,
+6ESF,,ROOF_FLASHING,"6"" EXCEL flat flashing 0/12-2/12, stainless, with storm collar",6,SS,0,,,,,0,2,roof,,,,,,,,,1,1,16,
+7ESF,,ROOF_FLASHING,"7"" EXCEL flat flashing 0/12-2/12, stainless, with storm collar",7,SS,0,,,,,0,2,roof,,,,,,,,,1,1,16,
+8ESF,,ROOF_FLASHING,"8"" EXCEL flat flashing 0/12-2/12, stainless, with storm collar",8,SS,0,,,,,0,2,roof,,,,,,,,,1,1,16,
+5ESFA,,ROOF_FLASHING,"5"" EXCEL adjustable flashing 1/12-7/12, stainless, with storm collar",5,SS,0,,,,,1,7,roof,,,,,,,,,1,1,16,
+6ESFA,,ROOF_FLASHING,"6"" EXCEL adjustable flashing 1/12-7/12, stainless, with storm collar",6,SS,0,,,,,1,7,roof,,,,,,,,,1,1,16,
+7ESFA,,ROOF_FLASHING,"7"" EXCEL adjustable flashing 1/12-7/12, stainless, with storm collar",7,SS,0,,,,,1,7,roof,,,,,,,,,1,1,16,
+8ESFA,,ROOF_FLASHING,"8"" EXCEL adjustable flashing 1/12-7/12, stainless, with storm collar",8,SS,0,,,,,1,7,roof,,,,,,,,,1,1,16,
+5ESFB,,ROOF_FLASHING,"5"" EXCEL adjustable flashing 8/12-12/12, stainless, with storm collar",5,SS,0,,,,,8,12,roof,,,,,,,,,1,1,16,
+6ESFB,,ROOF_FLASHING,"6"" EXCEL adjustable flashing 8/12-12/12, stainless, with storm collar",6,SS,0,,,,,8,12,roof,,,,,,,,,1,1,16,
+7ESFB,,ROOF_FLASHING,"7"" EXCEL adjustable flashing 8/12-12/12, stainless, with storm collar",7,SS,0,,,,,8,12,roof,,,,,,,,,1,1,16,
+8ESFB,,ROOF_FLASHING,"8"" EXCEL adjustable flashing 8/12-12/12, stainless, with storm collar",8,SS,0,,,,,8,12,roof,,,,,,,,,1,1,16,
+5ESFC,,ROOF_FLASHING,"5"" EXCEL adjustable flashing 12/12-21/12, stainless, with storm collar",5,SS,0,,,,,12,21,roof,,,,,,,,,1,1,16,
+6ESFC,,ROOF_FLASHING,"6"" EXCEL adjustable flashing 12/12-21/12, stainless, with storm collar",6,SS,0,,,,,12,21,roof,,,,,,,,,1,1,16,
+7ESFC,,ROOF_FLASHING,"7"" EXCEL adjustable flashing 12/12-21/12, stainless, with storm collar",7,SS,0,,,,,12,21,roof,,,,,,,,,1,1,16,
+8ESFC,,ROOF_FLASHING,"8"" EXCEL adjustable flashing 12/12-21/12, stainless, with storm collar",8,SS,0,,,,,12,21,roof,,,,,,,,,1,1,16,
+5EMFA,,ROOF_FLASHING,"5"" EXCEL metal roof flashing 3/12-7/12, with storm collar",5,GA,0,,,,,3,7,roof,,,,,,,,,0,1,16,
+6EMFA,,ROOF_FLASHING,"6"" EXCEL metal roof flashing 3/12-7/12, with storm collar",6,GA,0,,,,,3,7,roof,,,,,,,,,0,1,16,
+7EMFA,,ROOF_FLASHING,"7"" EXCEL metal roof flashing 3/12-7/12, with storm collar",7,GA,0,,,,,3,7,roof,,,,,,,,,0,1,16,
+8EMFA,,ROOF_FLASHING,"8"" EXCEL metal roof flashing 3/12-7/12, with storm collar",8,GA,0,,,,,3,7,roof,,,,,,,,,0,1,16,
+5EMFB,,ROOF_FLASHING,"5"" EXCEL metal roof flashing 8/12-12/12, with storm collar",5,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+6EMFB,,ROOF_FLASHING,"6"" EXCEL metal roof flashing 8/12-12/12, with storm collar",6,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+7EMFB,,ROOF_FLASHING,"7"" EXCEL metal roof flashing 8/12-12/12, with storm collar",7,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+8EMFB,,ROOF_FLASHING,"8"" EXCEL metal roof flashing 8/12-12/12, with storm collar",8,GA,0,,,,,8,12,roof,,,,,,,,,0,1,16,
+5EMFC,,ROOF_FLASHING,"5"" EXCEL metal roof flashing 12/12-21/12, with storm collar",5,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+6EMFC,,ROOF_FLASHING,"6"" EXCEL metal roof flashing 12/12-21/12, with storm collar",6,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+7EMFC,,ROOF_FLASHING,"7"" EXCEL metal roof flashing 12/12-21/12, with storm collar",7,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+8EMFC,,ROOF_FLASHING,"8"" EXCEL metal roof flashing 12/12-21/12, with storm collar",8,GA,0,,,,,12,21,roof,,,,,,,,,0,1,16,
+6ELFA,,ROOF_FLASHING,"6"" EXCEL flexible base flashing 1/12-7/12 (tile roofs), with storm collar",6,SS,0,,,,,1,7,roof,,,,,,,,,0,1,17,
+7ELFA,,ROOF_FLASHING,"7"" EXCEL flexible base flashing 1/12-7/12 (tile roofs), with storm collar",7,SS,0,,,,,1,7,roof,,,,,,,,,0,1,17,
+8ELFA,,ROOF_FLASHING,"8"" EXCEL flexible base flashing 1/12-7/12 (tile roofs), with storm collar",8,SS,0,,,,,1,7,roof,,,,,,,,,0,1,17,
+6ELFB,,ROOF_FLASHING,"6"" EXCEL flexible base flashing 8/12-12/12 (tile roofs), with storm collar",6,SS,0,,,,,8,12,roof,,,,,,,,,0,1,17,
+7ELFB,,ROOF_FLASHING,"7"" EXCEL flexible base flashing 8/12-12/12 (tile roofs), with storm collar",7,SS,0,,,,,8,12,roof,,,,,,,,,0,1,17,
+8ELFB,,ROOF_FLASHING,"8"" EXCEL flexible base flashing 8/12-12/12 (tile roofs), with storm collar",8,SS,0,,,,,8,12,roof,,,,,,,,,0,1,17,
+6ELFC,,ROOF_FLASHING,"6"" EXCEL flexible base flashing 12/12-21/12 (tile roofs), with storm collar",6,SS,0,,,,,12,21,roof,,,,,,,,,0,1,17,
+7ELFC,,ROOF_FLASHING,"7"" EXCEL flexible base flashing 12/12-21/12 (tile roofs), with storm collar",7,SS,0,,,,,12,21,roof,,,,,,,,,0,1,17,
+8ELFC,,ROOF_FLASHING,"8"" EXCEL flexible base flashing 12/12-21/12 (tile roofs), with storm collar",8,SS,0,,,,,12,21,roof,,,,,,,,,0,1,17,
+6EVF,,ROOF_FLASHING,"6"" EXCEL vented flashing 0/12-2/12, with storm collar",6,GA,0,,,,,0,2,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+7EVF,,ROOF_FLASHING,"7"" EXCEL vented flashing 0/12-2/12, with storm collar",7,GA,0,,,,,0,2,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+8EVF,,ROOF_FLASHING,"8"" EXCEL vented flashing 0/12-2/12, with storm collar",8,GA,0,,,,,0,2,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+6EVFA,,ROOF_FLASHING,"6"" EXCEL vented flashing 1/12-7/12, with storm collar",6,GA,0,,,,,1,7,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+7EVFA,,ROOF_FLASHING,"7"" EXCEL vented flashing 1/12-7/12, with storm collar",7,GA,0,,,,,1,7,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+8EVFA,,ROOF_FLASHING,"8"" EXCEL vented flashing 1/12-7/12, with storm collar",8,GA,0,,,,,1,7,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+6EVFB,,ROOF_FLASHING,"6"" EXCEL vented flashing 8/12-12/12, with storm collar",6,GA,0,,,,,8,12,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+7EVFB,,ROOF_FLASHING,"7"" EXCEL vented flashing 8/12-12/12, with storm collar",7,GA,0,,,,,8,12,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+8EVFB,,ROOF_FLASHING,"8"" EXCEL vented flashing 8/12-12/12, with storm collar",8,GA,0,,,,,8,12,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+6EVFC,,ROOF_FLASHING,"6"" EXCEL vented flashing 12/12-21/12, with storm collar",6,GA,0,,,,,12,21,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+7EVFC,,ROOF_FLASHING,"7"" EXCEL vented flashing 12/12-21/12, with storm collar",7,GA,0,,,,,12,21,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+8EVFC,,ROOF_FLASHING,"8"" EXCEL vented flashing 12/12-21/12, with storm collar",8,GA,0,,,,,12,21,roof,,,,,,,,,1,1,17,"Required where the chimney is enclosed in the attic or a combustible chase (manual p.9, p.16); the planner does not ask about enclosure yet."
+6EFP,,ROOF_FLASHING,"6"" EXCEL adjustable peak flashing 2/12-12/12, with storm collar",6,GA,0,,,,,2,12,roof,,,,,,,,,1,1,17,
+7EFP,,ROOF_FLASHING,"7"" EXCEL adjustable peak flashing 2/12-12/12, with storm collar",7,GA,0,,,,,2,12,roof,,,,,,,,,1,1,17,
+8EFP,,ROOF_FLASHING,"8"" EXCEL adjustable peak flashing 2/12-12/12, with storm collar",8,GA,0,,,,,2,12,roof,,,,,,,,,1,1,17,
+6EVCC,,CHASE_VENT_CONE,"6"" EXCEL ventilated chase cone for a custom chase cover, with storm collar",6,GA,0,,,,,,,,,,,,,,,,0,1,17,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+7EVCC,,CHASE_VENT_CONE,"7"" EXCEL ventilated chase cone for a custom chase cover, with storm collar",7,GA,0,,,,,,,,,,,,,,,,0,1,17,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."
+8EVCC,,CHASE_VENT_CONE,"8"" EXCEL ventilated chase cone for a custom chase cover, with storm collar",8,GA,0,,,,,,,,,,,,,,,,0,1,17,"Order code assumed to be size + code (as 6ERDS, 6ETI); the catalog names this part only by its code."

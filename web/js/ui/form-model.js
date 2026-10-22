@@ -21,7 +21,7 @@ export const EXAMPLE_STATE = {
   /** The framed chase the chimney exits, when any route uses one. Sizes are the chase's outside top. */
   chase: { topFt: 15, topIn: 0, widthIn: null, depthIn: null, airIntake: false, shroud: false,
            /** How high the chimney goes above the chase top: CODE = 3-2-10 rule at the chase top,
-            *  TWO_FT = 2 ft above it, SET = aboveIn (6" minimum, Duravent's cap clearance). */
+            *  TWO_FT = 2 ft above it, SET = aboveIn (at least the maker's chase-top minimum). */
            topRule: 'CODE', aboveIn: 6 },
   /**
    * Attic measured directly above the chimney's center. `from` says where the tape starts:
@@ -30,7 +30,8 @@ export const EXAMPLE_STATE = {
   attic: { from: 'JOISTS', ft: null, in: null, joistIn: 7.25, drywallIn: 0.5, deckIn: 1 },
   roof: { pitch: 6, surface: 'SHINGLE', method: 'EAVE', eaveFt: 9, eaveIn: 0, fromEaveFt: 4, ft: 11, in: 0, ridgeFt: 8 },
   nearby: [],
-  chimney: { finish: 'SS', connector: 'DB', highAltitude: false, siteElevationFt: null, cap: 'STANDARD', sparkArrestor: false, lockingBands: false },
+  /** line = the product line the parts come from (a code from the catalog, e.g. DT). */
+  chimney: { line: 'DT', finish: 'SS', connector: 'DB', highAltitude: false, siteElevationFt: null, cap: 'STANDARD', sparkArrestor: false, lockingBands: false },
 };
 
 /**
@@ -130,7 +131,7 @@ export function toSpec(state) {
   const isFp = a.kind === 'FIREPLACE';
   const c = state.chimney;
   const spec = {
-    line: 'DT',
+    line: c.line || 'DT',
     finish: c.finish,
     connectorLine: c.connector,
     // elevation only matters at high altitude: asked for only when the user ticks the box
@@ -141,7 +142,7 @@ export function toSpec(state) {
       label: a.label?.trim() || undefined,
       collarSizeIn: n(a.collar),
       outletElevationIn: toInches(a.outletFt, a.outletIn),
-      acceptsChimney: 'USER_CONFIRMED',   // the user has chosen DuraTech for this appliance
+      acceptsChimney: 'USER_CONFIRMED',   // the user has chosen this chimney for the appliance
       minSystemHeightFt: n(a.minHeightFt) ?? undefined,
       maxSystemHeightFt: n(a.maxHeightFt) ?? undefined,
       maxOffsets: n(a.maxOffsets) ?? undefined,

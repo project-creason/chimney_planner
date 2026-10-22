@@ -3,15 +3,16 @@
  * and gets back the parts list.
  *
  *   GET  /api/health
- *   GET  /api/lines                 active product lines with manufacturer name, logo, sizes, finishes and the
- *                                   elbow offset chart (the form offers only the shifts the chart makes)
+ *   GET  /api/lines                 active product lines with manufacturer name, logo, sizes, finishes, the
+ *                                   elbow offset chart (the form offers only the shifts the chart makes) and
+ *                                   options: what the line offers, so the form shows only those choices
  *   POST /api/plan   { spec }       -> { manufacturer, line, plan }   (spec = ChimneySpec, see web/js/engine/spec.js)
  *   GET  /logos/<file>              manufacturer logos from catalog/logos/
  */
 import { readFile } from 'node:fs/promises';
 import { basename, dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { makeCatalog } from '../web/js/engine/catalog.js';
+import { makeCatalog, lineOptions } from '../web/js/engine/catalog.js';
 import { planChimney } from '../web/js/engine/planner.js';
 import { readCatalog } from './db/catalog-store.mjs';
 
@@ -47,7 +48,7 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
     'GET /api/health': async () => ({ ok: true }),
 
     'GET /api/lines': async () => {
-      const { lines } = await load();
+      const { index, lines, catalogs } = await load();
       return Object.values(lines).map(l => ({
         code: l.line.code, name: l.line.name, family: l.line.family,
         manufacturer: manufacturerOut(l.manufacturer),
@@ -55,6 +56,7 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
         outer_in: Object.fromEntries(l.sizes.map(s => [s.size, s.outer_in])),
         finishes: [...new Set(l.parts.filter(p => p.category === 'CHIMNEY_PIPE').map(p => p.finish).filter(Boolean))],
         elbow_offsets: l.lookups?.elbow_offsets || [],
+        options: lineOptions(catalogs.get(l.line.code), index),
       }));
     },
 
