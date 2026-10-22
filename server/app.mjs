@@ -6,6 +6,9 @@
  *   GET  /api/lines                 active product lines with manufacturer name, logo, sizes, finishes and the
  *                                   elbow offset chart (the form offers only the shifts the chart makes)
  *   POST /api/plan   { spec }       -> { manufacturer, line, plan }   (spec = ChimneySpec, see web/js/engine/spec.js)
+ *                                   with an X-Customer-Key header, also `order`: the parts at that customer's SKUs
+ *                                   and prices (see server/pricing.mjs)
+ *   GET  /api/customer              the customer an X-Customer-Key belongs to, and its current price list
  *   GET  /logos/<file>              manufacturer logos from catalog/logos/
  */
 import { readFile } from 'node:fs/promises';
@@ -14,6 +17,8 @@ import { fileURLToPath } from 'node:url';
 import { makeCatalog } from '../web/js/engine/catalog.js';
 import { planChimney } from '../web/js/engine/planner.js';
 import { readCatalog } from './db/catalog-store.mjs';
+import { customerByKey, customerPricing } from './db/customer-store.mjs';
+import { priceOrder } from './pricing.mjs';
 
 // Not imported from db/connect.mjs, so a host can hand in its own database client (see api/_handler.js).
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -42,6 +47,14 @@ const manufacturerOut = m => m && ({ code: m.code, name: m.name, website: m.webs
 
 export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*' } = {}) {
   const load = catalogCache(db);
+  /** The customer whose private link the page was opened with; null when there is none; 403 when it's wrong. */
+  const customerOf = async req => {
+    const key = req.headers?.['x-customer-key'];
+    if (!key) return null;
+    const c = await customerByKey(db, String(key));
+    if (!c) throw Object.assign(new Error('This customer link is not valid. Ask for a new one.'), { status: 403 });
+    return c;
+  };
 
   const routes = {
     'GET /api/health': async () => ({ ok: true }),
@@ -58,19 +71,32 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
       }));
     },
 
-    'POST /api/plan': async body => {
+    'GET /api/customer': async (body, req) => {
+      const c = await customerOf(req);
+      if (!c) throw Object.assign(new Error('Send the customer key in X-Customer-Key.'), { status: 400 });
+      const { priceList } = await customerPricing(db, c.code);
+      return { code: c.code, name: c.name, price_list: priceList };
+    },
+
+    'POST /api/plan': async (body, req) => {
       const spec = body?.spec;
       if (!spec || typeof spec !== 'object') throw Object.assign(new Error('Send { "spec": { ... } }.'), { status: 400 });
       const { catalogs } = await load();
       const cat = catalogs.get(spec.line);
       if (!cat) throw Object.assign(new Error(`Unknown product line '${spec.line}'.`), { status: 400 });
-      return { manufacturer: manufacturerOut(cat.manufacturer), line: { code: cat.line.code, name: cat.line.name },
+      const customer = await customerOf(req);
+      const out = { manufacturer: manufacturerOut(cat.manufacturer), line: { code: cat.line.code, name: cat.line.name },
         plan: planChimney(structuredClone(spec), cat) };
+      if (customer) {
+        out.order = { customer: { code: customer.code, name: customer.name },
+          ...priceOrder(out.plan.parts, cat.line.code, await customerPricing(db, customer.code)) };
+      }
+      return out;
     },
   };
 
   return async function handle(req, res) {
-    const cors = { 'Access-Control-Allow-Origin': allowedOrigin, 'Access-Control-Allow-Headers': 'Content-Type',
+    const cors = { 'Access-Control-Allow-Origin': allowedOrigin, 'Access-Control-Allow-Headers': 'Content-Type, X-Customer-Key',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
     const send = (status, body, headers = {}) => {
       const isBuf = Buffer.isBuffer(body);
@@ -109,7 +135,7 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
           try { body = JSON.parse(raw || '{}'); } catch { return send(400, { error: 'Body must be JSON' }); }
         }
       }
-      return send(200, await route(body));
+      return send(200, await route(body, req), { 'Cache-Control': 'no-store' });
     } catch (e) {
       const status = e.status || 500;
       if (status === 500) console.error(e);

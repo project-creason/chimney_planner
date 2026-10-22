@@ -15,8 +15,9 @@ plans; the results say which one made the plan ("worked out by the planning serv
 | `catalog/` | The editable source: Duravent catalog data and rules as CSV files. See `catalog/README.md`. |
 | `tools/build_catalog.py` | Checks the CSVs and builds `web/catalog/*.json`. Python 3, standard library only. |
 | `web/` | The website itself. This folder is what gets hosted. |
-| `server/` | The API and database: `schema.sql`, CSV import and export, and the HTTP server. |
-| `api/` | The API as Vercel functions (`/api/lines`, `/api/plan`, `/api/health`), all running `server/app.mjs`. |
+| `customers/` | Retailers' and distributors' own part numbers and prices. Only the made-up `DEMO` is committed. See `customers/README.md`. |
+| `server/` | The API and database: `schema.sql`, CSV import and export, customer pricing, and the HTTP server. |
+| `api/` | The API as Vercel functions (`/api/lines`, `/api/plan`, `/api/customer`, `/api/health`), all running `server/app.mjs`. |
 | `tests/` | Automated tests for the planner and the form, plus 282 recorded plans every change must reproduce. |
 | `server/tests/` | Database and API tests (need `npm install`). |
 
@@ -28,6 +29,8 @@ npm install             # once, for the database client
 npm test                # run all the tests (Node 22+)
 npm run db:import       # check the CSVs and load them into the database (data/chimney.db unless TURSO_DATABASE_URL is set)
 npm run db:export -- DIR   # write the database back out as CSVs in the catalog/ layout
+npm run customer:import -- customers/DEMO   # check and load a customer's SKUs and prices; prints its private link key
+npm run customer:export -- DEMO DIR         # write a customer's sheets back out
 npm run server          # API on http://localhost:8787 (POST /api/plan, GET /api/lines)
 npm run dev             # site + API together on http://localhost:3000, as Vercel serves them
 npm run check:api -- URL   # send the 282 recorded scenarios to a running API and compare
@@ -42,6 +45,10 @@ Opening `web/index.html` by double-clicking won't work: the browser blocks it fr
 Without settings, the server and import use a local file, `data/chimney.db`. To use Turso, set
 `TURSO_DATABASE_URL` (`libsql://...`) and `TURSO_AUTH_TOKEN`, then run `npm run db:import`. The import replaces
 the catalog and rules as a whole; customer tables (part numbers, prices, stricter rules) are never touched by it.
+
+A customer's private link, `/?customer=<key>`, shows the plan with their SKUs, prices and a subtotal, and adds a
+"Download order" button (a CSV with SKU, manufacturer part number, quantity, unit price and line total). Only the
+server has customer data, so the GitHub Pages copy shows no prices.
 
 ## Hosting
 
