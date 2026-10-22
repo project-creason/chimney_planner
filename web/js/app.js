@@ -1,10 +1,10 @@
 /**
  * Questionnaire page: binds the form to a plain state object, converts it with toSpec(),
- * runs the engine on every change, and renders the results sheet.
+ * asks for a plan on every change (from the server, or the engine in the browser: see planner-source.js),
+ * and renders the results sheet.
  */
-import { loadCatalog } from './engine/catalog.js';
 import { offsetChoices } from './engine/geometry.js';
-import { planChimney } from './engine/planner.js';
+import { connectPlanner } from './planner-source.js';
 import { EXAMPLE_STATE, blankState, toSpec, fmtFtIn, passesThroughRoof, roofHeightIn, atticMethodApplies,
          deckUndersideIn, topCeilingIn } from './ui/form-model.js';
 
@@ -14,7 +14,7 @@ const form = $('#q');
 const clone = o => structuredClone(o);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-let catalog = null;
+let planner = null;
 let state = loadState();
 let lastResult = null;
 let lastSpec = null;
@@ -139,7 +139,7 @@ const ROW = {
     </div>`,
 };
 // ------------------------------------------------------------------ offsets: only shifts the elbow chart can make
-const chart = () => catalog?.lookups?.elbow_offsets || [];
+const chart = () => planner?.elbowOffsets || [];
 const allowedAngles = () => (state.appliance.only15 ? [15] : [15, 30]);
 const rowAngles = r => (['15', '30'].includes(String(r.angle)) ? [Number(r.angle)] : allowedAngles())
   .filter(a => allowedAngles().includes(a));
@@ -194,7 +194,7 @@ function renderOffsetCalcs(r) {
       fit = ` Height: about ${inFrac(o.estimatedRoomIn)} open (estimated) − ${inFrac(pick.rise_in)} = ${spare >= 0 ? `${inFrac(spare)} to spare` : `<b class="short">${inFrac(-spare)} short</b>`}.`;
     }
     const other = !o && candidates.length > 1 ? ` Or ${candidates.slice(1).map(c => `${c.angle_deg}° elbows: ${inFrac(c.rise_in)} tall`).join(', ')}; Auto picks the one that fits.` : '';
-    el.innerHTML = `${pipe} → <b>${inFrac(pick.offset_in)}</b> sideways over <b>${inFrac(pick.rise_in)}</b> of height (Duravent elbow chart).${fit}${other}`;
+    el.innerHTML = `${pipe} → <b>${inFrac(pick.offset_in)}</b> sideways over <b>${inFrac(pick.rise_in)}</b> of height (${esc(makerName())} elbow chart).${fit}${other}`;
   }
 }
 
@@ -406,7 +406,7 @@ function figures(r, spec) {
       (isFp ? '' : ' It includes the stovepipe between the stove and the ceiling, but stovepipe parts are not in this parts list.') });
   // the figure is measured where the planner measures the exit: roof at the pipe's center, chase top, or wall top
   const pitch = spec.roof?.pitch ?? 0;
-  const outer = catalog?.sizes?.find(z => z.size === String(spec.appliance.collarSizeIn))?.outer_in;
+  const outer = planner?.outerIn(spec.appliance.collarSizeIn);
   if (g.exit === 'roof penetration') {
     const highIn = outer ? (outer / 2) * pitch / 12 : 0;
     out.push({ label: 'Above the Roof', value: fmtFtIn(g.aboveExitIn),
@@ -426,14 +426,14 @@ function figures(r, spec) {
 }
 
 function partsCsv(r, spec) {
-  const head = ['Qty', 'Part number', 'Stock number', 'Description', 'Section', 'Optional', 'Not a Duravent part', 'Flag', 'Why'];
+  const head = ['Qty', 'Part number', 'Stock number', 'Description', 'Section', 'Optional', `Not a ${makerName()} part`, 'Flag', 'Why'];
   const rows = r.parts.map(p => [
     p.qty, p.order_number, p.stock_number, p.description, ZONE_NAMES[p.zone] || p.zone || '',
     p.optional ? 'yes' : '', p.non_catalog ? 'yes' : '',
     (p.flags || []).map(f => `${f.level}: ${f.text}`).join(' | '), p.reasons.join(' '),
   ]);
   const label = spec.appliance.label ? ` for ${spec.appliance.label}` : '';
-  const title = [`DuraTech ${spec.appliance.collarSizeIn}" chimney${label}`];
+  const title = [`${makerName()} ${planner.line.name} ${spec.appliance.collarSizeIn}" chimney${label}`];
   const figs = figures(r, spec).map(f => [f.label, f.value, f.note].map(csvCell).join(','));
   // BOM so Excel reads ° and × correctly
   return '\ufeff' + [title.map(csvCell).join(','), ...figs, '', head.join(','), ...rows.map(row => row.map(csvCell).join(','))].join('\r\n') + '\r\n';
@@ -462,17 +462,31 @@ csvBtn.addEventListener('click', async () => {
 });
 
 // ------------------------------------------------------------------ planning + rendering
+const makerName = () => planner?.manufacturer?.name || 'the manufacturer';
+let planSeq = 0;
+let planTimer = null;
 function update() {
   saveState();
   applyVisibility();
-  if (!catalog) return;
+  if (!planner) return;
   const spec = toSpec(state);
-  let result;
-  try { result = planChimney(spec, catalog); }
-  catch (err) { result = { ok: false, errors: [`The planner hit an unexpected problem: ${err.message}`], warnings: [], notes: [], checks: [], parts: [], geometry: {} }; }
-  lastResult = result;
-  lastSpec = spec;
-  render(result, spec);
+  const seq = ++planSeq;
+  const run = async () => {
+    let result;
+    try { result = await planner.plan(spec); }
+    catch (err) { result = { ok: false, errors: [`The planner hit an unexpected problem: ${err.message}`], warnings: [], notes: [], checks: [], parts: [], geometry: {} }; }
+    if (seq !== planSeq) return;   // a newer answer is already being planned
+    lastResult = result;
+    lastSpec = spec;
+    $('#results').removeAttribute('aria-busy');
+    render(result, spec);
+  };
+  clearTimeout(planTimer);
+  if (planner.mode === 'server') {
+    // wait for a pause in typing, then ask once
+    $('#results').setAttribute('aria-busy', 'true');
+    planTimer = setTimeout(run, 250);
+  } else run();
 }
 
 const ICON = {
@@ -584,6 +598,8 @@ function render(r, spec) {
         <dd>${f.value}</dd>
         <p class="fig-tip" id="fig-tip-${i}" role="tooltip">${esc(f.note)}</p>
       </div>`).join('');
+    $('#maker').innerHTML = `Parts from <b>${esc(makerName())}</b>, ${esc(planner.line.name)} line` +
+      ` <span class="source">· worked out ${planner.mode === 'server' ? 'by the planning server' : 'in this browser'}</span>`;
     $('#governing').innerHTML = `Height set by <b>${esc(g.governingRule)}</b>: at least ${fmtFtIn(g.requiredTopIn, true)} above the floor.`;
     const offs = g.offsets || [];
     $('#offsetInfo').hidden = !offs.length;
@@ -612,7 +628,7 @@ function renderParts(parts) {
     rows.push(`<tr${(p.flags || []).some(f => f.level === 'STOP') ? ' class="row-stop"' : ''}>
       <td class="qty">${p.qty}</td>
       <td class="pn">${esc(p.order_number)}${p.stock_number ? `<small>${esc(p.stock_number)}</small>` : ''}</td>
-      <td>${(p.flags || []).map(f => ICON[f.level]).join('')}${esc(p.description)}${p.optional ? '<span class="chip">optional</span>' : ''}${p.non_catalog ? '<span class="chip">not a Duravent part</span>' : ''}
+      <td>${(p.flags || []).map(f => ICON[f.level]).join('')}${esc(p.description)}${p.optional ? '<span class="chip">optional</span>' : ''}${p.non_catalog ? `<span class="chip">not a ${esc(makerName())} part</span>` : ''}
         <span class="why">${esc(p.reasons.join(' '))}</span>
         ${(p.flags || []).map(f => `<span class="flag ${f.level.toLowerCase()}">${esc(f.text)}</span>`).join('')}</td></tr>`);
   }
@@ -725,9 +741,10 @@ fillPitchOptions();
 writeControls();
 syncManualBox(true);
 applyVisibility();
-loadCatalog('catalog', 'DT')
-  .then(c => {
-    catalog = c;
+connectPlanner('DT')
+  .then(p => {
+    planner = p;
+    document.documentElement.dataset.planner = p.mode;
     snapOffsets();
     for (const box of form.querySelectorAll('[data-kind="offset"]')) renderList(box);
     update();

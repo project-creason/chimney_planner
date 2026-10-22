@@ -3,9 +3,10 @@
 Enter details about a home and a wood stove or factory-built fireplace, and get a complete Duravent
 DuraTech (5"–8") chimney parts list that follows Duravent's instructions and NFPA 211.
 
-The live site runs in the browser: plain HTML and JavaScript plus the catalog as JSON. A server version is in
-`server/`: the catalog and rules live in a database (SQLite, hosted on Turso) and the browser asks the server for
-the parts list, so the rules aren't visible in the page. Both use the same planner engine and must give identical plans.
+The same page runs two ways. Where it is served with the planner API (on Vercel), every plan is worked out by the
+server from the database (SQLite, hosted on Turso). Where there is no API (GitHub Pages, a plain static server), it
+loads the catalog as JSON and runs the engine in the browser. Both use the same planner engine and must give identical
+plans; the results say which one made the plan ("worked out by the planning server" or "in this browser").
 
 ## Folders
 
@@ -15,6 +16,7 @@ the parts list, so the rules aren't visible in the page. Both use the same plann
 | `tools/build_catalog.py` | Checks the CSVs and builds `web/catalog/*.json`. Python 3, standard library only. |
 | `web/` | The website itself. This folder is what gets hosted. |
 | `server/` | The API and database: `schema.sql`, CSV import and export, and the HTTP server. |
+| `api/` | The API as Vercel functions (`/api/lines`, `/api/plan`, `/api/health`), all running `server/app.mjs`. |
 | `tests/` | Automated tests for the planner and the form, plus 282 recorded plans every change must reproduce. |
 | `server/tests/` | Database and API tests (need `npm install`). |
 
@@ -27,6 +29,8 @@ npm test                # run all the tests (Node 22+)
 npm run db:import       # check the CSVs and load them into the database (data/chimney.db unless TURSO_DATABASE_URL is set)
 npm run db:export -- DIR   # write the database back out as CSVs in the catalog/ layout
 npm run server          # API on http://localhost:8787 (POST /api/plan, GET /api/lines)
+npm run dev             # site + API together on http://localhost:3000, as Vercel serves them
+npm run check:api -- URL   # send the 282 recorded scenarios to a running API and compare
 node tools/make_golden.mjs # re-record the 282 plans, only when a plan is meant to change
 cd web && python3 -m http.server 8000   # try it at http://localhost:8000
 ```
@@ -41,7 +45,13 @@ the catalog and rules as a whole; customer tables (part numbers, prices, stricte
 
 ## Hosting
 
-The `web/` folder is a static site and works on any static host (GitHub Pages, Netlify, Cloudflare Pages).
+**Vercel (site + API):** `vercel.json` serves `web/` as the site and `api/` as the server, on the free Hobby plan.
+In Vercel choose **Add New → Project**, import this repository and leave the build settings as they are. Under
+**Settings → Environment Variables** add `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` (a read-only Turso token is
+enough; the site never writes), then redeploy. Every pull request gets its own preview address.
+
+The `web/` folder on its own is a static site and works on any static host (GitHub Pages, Netlify, Cloudflare
+Pages); there it plans in the browser.
 
 **GitHub Pages:** in this repository go to **Settings → Pages → Build and deployment** and set **Source** to
 **GitHub Actions**. Every push to `main` then rebuilds the catalog, runs the tests, and publishes `web/`.

@@ -179,6 +179,9 @@ input:hover, select:hover { border-color: var(--steel); }
 .figures dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .governing { margin: 0; font-size: 13.5px; color: var(--muted); }
 .governing b { color: var(--ink); font-weight: 600; }
+.maker { margin: 0 0 10px; font-size: 13.5px; color: var(--muted); }
+.maker b { color: var(--ink); font-weight: 600; }
+.results[aria-busy="true"] #summary, .results[aria-busy="true"] #partsArea { opacity: .6; transition: opacity .15s .3s; }
 .offset-info { margin: 6px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; color: var(--muted); }
 .offset-info b { color: var(--accent); font-weight: 600; }
 
@@ -832,11 +835,12 @@ svg [hidden] { display: none; }
     </fieldset>
   </form>
 
-  <aside class="results" aria-live="polite">
+  <aside class="results" id="results" aria-live="polite">
     <div class="sheet" id="sheet">
       <h2>Parts list</h2>
       <div id="status"><p class="loading">Loading the catalog…</p></div>
       <div id="summary" hidden>
+        <p class="maker" id="maker"></p>
         <dl class="figures" id="figures"></dl>
         <p class="governing" id="governing"></p>
         <ul class="offset-info" id="offsetInfo" hidden></ul>

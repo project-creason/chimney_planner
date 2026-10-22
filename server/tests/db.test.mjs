@@ -73,6 +73,8 @@ test('API: lines with manufacturer, plans, and errors', async () => {
     assert.equal(lines[0].code, 'DT');
     assert.deepEqual(lines[0].manufacturer, { code: 'DURAVENT', name: 'Duravent', website: 'www.duravent.com', logo_url: null });
     assert.deepEqual(lines[0].sizes, ['5', '6', '7', '8']);
+    assert.deepEqual(lines[0].outer_in, { 5: 7, 6: 8, 7: 9, 8: 10 });
+    assert.deepEqual(lines[0].elbow_offsets, build.lines.DT.lookups.elbow_offsets);
 
     const post = body => fetch(`${base}/api/plan`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
     const r = await post(JSON.stringify({ spec: EXAMPLE_RANCH }));
@@ -100,4 +102,19 @@ test('API: an empty database says to import the catalog', async () => {
     assert.equal(r.status, 503);
     assert.match((await r.json()).error, /db:import/);
   } finally { server.close(); }
+});
+
+test('API: a body the host already parsed (as Vercel does) plans the same', async () => {
+  const handle = createApp({ db: await freshDb() });
+  const call = body => new Promise(done => {
+    const res = { writeHead(status) { this.status = status; }, end(text) { done({ status: this.status, json: JSON.parse(text) }); } };
+    handle({ method: 'POST', url: '/api/plan', headers: {}, body }, res);
+  });
+  const golden = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/golden-plans.json'), 'utf8'));
+  const r = await call({ spec: EXAMPLE_RANCH });
+  assert.equal(r.status, 200);
+  assert.deepStrictEqual(r.json.plan, golden.find(g => g.name === 'ranch 6" SS 6/12').result);
+  assert.equal((await call(JSON.stringify({ spec: EXAMPLE_RANCH }))).status, 200);
+  assert.equal((await call('not json')).status, 400);
+  assert.equal((await call(undefined)).status, 400);
 });

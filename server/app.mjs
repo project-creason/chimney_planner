@@ -3,16 +3,20 @@
  * and gets back the parts list.
  *
  *   GET  /api/health
- *   GET  /api/lines                 active product lines with manufacturer name, logo, sizes and finishes
+ *   GET  /api/lines                 active product lines with manufacturer name, logo, sizes, finishes and the
+ *                                   elbow offset chart (the form offers only the shifts the chart makes)
  *   POST /api/plan   { spec }       -> { manufacturer, line, plan }   (spec = ChimneySpec, see web/js/engine/spec.js)
  *   GET  /logos/<file>              manufacturer logos from catalog/logos/
  */
 import { readFile } from 'node:fs/promises';
-import { basename, extname, resolve } from 'node:path';
+import { basename, dirname, extname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { makeCatalog } from '../web/js/engine/catalog.js';
 import { planChimney } from '../web/js/engine/planner.js';
 import { readCatalog } from './db/catalog-store.mjs';
-import { ROOT } from './db/connect.mjs';
+
+// Not imported from db/connect.mjs, so a host can hand in its own database client (see api/_handler.js).
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const MAX_BODY = 100_000;
 const LOGO_TYPES = { '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
@@ -48,7 +52,9 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
         code: l.line.code, name: l.line.name, family: l.line.family,
         manufacturer: manufacturerOut(l.manufacturer),
         sizes: l.sizes.map(s => s.size),
+        outer_in: Object.fromEntries(l.sizes.map(s => [s.size, s.outer_in])),
         finishes: [...new Set(l.parts.filter(p => p.category === 'CHIMNEY_PIPE').map(p => p.finish).filter(Boolean))],
+        elbow_offsets: l.lookups?.elbow_offsets || [],
       }));
     },
 
@@ -87,11 +93,21 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
       let body;
       if (req.method === 'POST') {
         let raw = '';
-        for await (const chunk of req) {
-          raw += chunk;
-          if (raw.length > MAX_BODY) return send(413, { error: 'Request too large' });
+        if ('body' in req) {
+          // Vercel reads the body before the handler runs and parses JSON itself
+          try { body = req.body; } catch { return send(400, { error: 'Body must be JSON' }); }
+          if (Buffer.isBuffer(body) || typeof body === 'string') { raw = String(body); body = undefined; }
+          else if (body == null) raw = '';
+        } else {
+          for await (const chunk of req) {
+            raw += chunk;
+            if (raw.length > MAX_BODY) return send(413, { error: 'Request too large' });
+          }
         }
-        try { body = JSON.parse(raw || '{}'); } catch { return send(400, { error: 'Body must be JSON' }); }
+        if (body === undefined) {
+          if (raw.length > MAX_BODY) return send(413, { error: 'Request too large' });
+          try { body = JSON.parse(raw || '{}'); } catch { return send(400, { error: 'Body must be JSON' }); }
+        }
       }
       return send(200, await route(body));
     } catch (e) {
