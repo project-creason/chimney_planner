@@ -1,0 +1,36 @@
+key,kind,direction,unit,engine_uses,description
+clearance.combustibles_in,LIMIT,MIN,in,1,Air space between the chimney and combustibles
+flue.diameter_match_appliance,REQUIREMENT,,,1,Chimney diameter equals the appliance flue outlet
+offset.max_count,LIMIT,MAX,count,1,Most offsets (elbow pairs) allowed in one installation
+offset.max_elbow_angle_deg,LIMIT,MAX,deg,0,Steepest elbow angle from vertical
+offset.strap_per_offset,LIMIT,MIN,count,0,Elbow straps needed per offset
+attic.shield_required,REQUIREMENT,,,1,Attic insulation shield wherever the chimney passes through an attic
+ceiling.firestop_required,REQUIREMENT,,,0,Firestop at each floor or ceiling penetration without a support box
+ceiling.pass_through_shield_above_fireplace,ADVICE,,,1,When the pass-through shield suits a ceiling above a fireplace
+wall.thimble_with_pipe,REQUIREMENT,,,0,Every through-the-wall run uses a wall thimble
+wall.thimble_interior_projection_in,LIMIT,EXACT,in,1,How far chimney pipe extends into the room past the interior wall
+wall.strap_interval_ft,LIMIT,MAX,ft,1,Largest spacing between wall straps on an exterior run
+roof.bracket_threshold_ft,LIMIT,MAX,ft,1,Height above the roof at which a roof bracket is required
+roof.bracket_interval_ft,LIMIT,MAX,ft,1,Additional height per extra roof bracket
+roof.storm_collar_with_flashing,REQUIREMENT,,,1,A storm collar with every roof flashing
+roof.radiation_shield_per_appliance,ADVICE,,,1,Roof radiation shield when the appliance manual calls for one
+term.min_above_penetration_ft,LIMIT,MIN,ft,1,Height above where the chimney passes through the roof (3 ft of 3-2-10)
+term.min_above_within_horizontal_ft,LIMIT,MIN,ft,1,Height above anything within the horizontal distance (2 ft of 3-2-10)
+term.horizontal_check_distance_ft,LIMIT,MIN,ft,1,Horizontal distance for the 2 ft rule (10 ft of 3-2-10)
+termination.shroud_spec,REQUIREMENT,,,1,Decorative shrouds must follow the manufacturer's shroud specification
+draft.min_vertical_ft,LIMIT,MIN,ft,1,"Straight system height above the appliance outlet at sea level (value = low end, value_max = high end)"
+draft.elbow_or_altitude_factor,LIMIT,MIN,multiplier,1,"Height multiplier for elbows, a tee or high altitude (value = one, value_max = both)"
+draft.high_altitude_threshold_ft,LIMIT,MAX,ft,1,Site elevation from which high altitude applies
+route.interior_preferred,ADVICE,,,1,Route the chimney inside the building when possible
+general.inspection_recommended,ADVICE,,,1,Have the finished system inspected
+appliance.must_approve_chimney,REQUIREMENT,,,1,The appliance manufacturer approves this chimney for the model
+chase.storm_collar_required,REQUIREMENT,,,1,A storm collar where the chimney exits a chase top
+chase.min_cap_clearance_in,LIMIT,MIN,in,1,Chase top flashing to the bottom of the cap
+nfpa.factory_built_per_listing,REQUIREMENT,,,0,Factory-built chimneys follow their listing
+nfpa.connector_not_through_concealed,REQUIREMENT,,,0,Connectors do not pass through ceilings or concealed spaces
+nfpa.connector_wall_pass_through,REQUIREMENT,,,0,Connectors through combustible walls use a listed pass-through
+nfpa.connector_min_rise_in_per_ft,LIMIT,MIN,in/ft,0,Connector slope toward the chimney
+nfpa.connector_max_horizontal_pct_of_vertical,LIMIT,MAX,%,0,Horizontal connector length relative to chimney height
+nfpa.single_wall_connector_clearance_in,LIMIT,MIN,in,0,Single-wall connector clearance to combustibles
+nfpa.flue_not_smaller_than_outlet,REQUIREMENT,,,0,Flue not smaller than the appliance collar
+nfpa.termination_3_2_10,REQUIREMENT,,,0,Termination height rule

@@ -3,6 +3,7 @@ Validate the CSV catalog and compile it to JSON for the website.
 
     python tools/build_catalog.py            # validate + write dist/catalog/
     python tools/build_catalog.py --check    # validate only
+    python tools/build_catalog.py --catalog DIR --out DIR   # another catalog folder (used by the export round trip)
 
 Source of truth:  catalog/shared/*.csv  and  catalog/lines/<LINE>/*.csv
 Output:           web/catalog/index.json   (lines, categories, rules, attribute defs, compatibility)
@@ -20,11 +21,21 @@ ROOT = Path(__file__).resolve().parent.parent
 CAT = ROOT / "catalog"
 OUT = ROOT / "web" / "catalog"
 
+
+def _arg(name):
+    return Path(sys.argv[sys.argv.index(name) + 1]).resolve() if name in sys.argv else None
+
+
+CAT = _arg("--catalog") or CAT
+OUT = _arg("--out") or OUT
+
 FINISHES = {"GA", "SS", "BLACK", "GALV", "ALUM", "EPDM", "UNPAINTED"}
 ZONES = {"appliance", "pipe", "offset", "ceiling", "attic", "wall", "support", "roof", "termination", "chase", "hardware"}
 FAMILIES = {"CHIMNEY", "CONNECTOR", "LINER", "DIRECT_VENT", "PELLET", "GAS_VENT"}
 FUELS = {"WOOD", "COAL", "OIL", "GAS", "PELLET"}
 AUTHORITIES = {"MANUFACTURER", "NFPA211", "IRC", "LOCAL", "INDUSTRY"}   # INDUSTRY: common trade practice
+RULE_KINDS = {"LIMIT", "REQUIREMENT", "ADVICE"}
+RULE_DIRECTIONS = {"MIN", "MAX", "EXACT"}      # MIN: a higher value is stricter; MAX: a lower one is
 PIPE_CATEGORIES = {"CHIMNEY_PIPE"}          # get effective_length_in computed
 RANGE_PAIRS = [("adjustable_min_in", "adjustable_max_in"), ("pitch_min", "pitch_max"),
                ("wall_min_in", "wall_max_in"), ("standoff_min_in", "standoff_max_in")]
@@ -42,9 +53,19 @@ P = Problems()
 
 
 # ---------------------------------------------------------------- reading
+def _rel(path):
+    """Path as shown in messages: relative to the repo, or to the catalog folder's parent for --catalog."""
+    for base in (ROOT, CAT.parent):
+        try:
+            return path.relative_to(base)
+        except ValueError:
+            pass
+    return path
+
+
 def read(path, required, optional=()):
     """Read a CSV; return list of (where, row_dict). Header must match exactly (order free)."""
-    rel = path.relative_to(ROOT)
+    rel = _rel(path)
     if not path.exists():
         P.err(rel, "file missing")
         return []
@@ -108,7 +129,14 @@ def pipe_list(v):
 
 # ---------------------------------------------------------------- shared
 def build_shared():
-    mfrs = {r["code"]: r for _, r in read(CAT / "shared/manufacturers.csv", ["code", "name", "website"])}
+    mfrs = {}
+    for w, r in read(CAT / "shared/manufacturers.csv", ["code", "name", "website"], ["logo_file"]):
+        if r["code"] in mfrs:
+            P.err(w, f"duplicate manufacturer '{r['code']}'")
+        if r.get("logo_file") and not (CAT / "logos" / r["logo_file"]).exists():
+            P.err(w, f"logo_file '{r['logo_file']}' not found in catalog/logos/")
+        mfrs[r["code"]] = {"code": r["code"], "name": r["name"], "website": r["website"],
+                           "logo_file": r.get("logo_file") or None}
 
     sources = {}
     for w, r in read(CAT / "shared/sources.csv", ["source_code", "manufacturer", "document_code", "title", "published"]):
@@ -161,16 +189,32 @@ def build_shared():
         attr_defs[r["key"]] = {"key": r["key"], "type": r["type"], "allowed_values": pipe_list(r["allowed_values"]),
                                "unit": r["unit"] or None, "categories": cats, "description": r["description"]}
 
+    rule_defs = {}
+    for w, r in read(CAT / "shared/rule_defs.csv", ["key", "kind", "direction", "unit", "engine_uses", "description"]):
+        if r["key"] in rule_defs:
+            P.err(w, f"duplicate rule key '{r['key']}'")
+        kind = enum(w, r, "kind", RULE_KINDS, required=True)
+        direction = enum(w, r, "direction", RULE_DIRECTIONS, required=kind == "LIMIT")
+        if kind != "LIMIT" and direction:
+            P.err(w, "only LIMIT rules have a direction")
+        rule_defs[r["key"]] = {"key": r["key"], "kind": kind, "direction": direction, "unit": r["unit"] or None,
+                               "engine_uses": flag(w, r, "engine_uses"), "description": r["description"]}
+
     rules = []
     seen = set()
     for w, r in read(CAT / "shared/rules.csv",
                      ["rule_key", "authority", "scope", "value", "value_max", "unit", "statement", "source_ref", "verified"]):
-        if r["rule_key"] in seen:
-            P.err(w, f"duplicate rule_key '{r['rule_key']}'")
-        seen.add(r["rule_key"])
+        if (r["rule_key"], r["scope"]) in seen:
+            P.err(w, f"duplicate rule '{r['rule_key']}' for scope '{r['scope']}'")
+        seen.add((r["rule_key"], r["scope"]))
+        if r["rule_key"] not in rule_defs:
+            P.err(w, f"rule '{r['rule_key']}' is not defined in shared/rule_defs.csv")
         enum(w, r, "authority", AUTHORITIES, required=True)
-        if r["scope"] != "GLOBAL" and r["scope"] not in lines:
-            P.err(w, f"scope must be GLOBAL or a product line code, got '{r['scope']}'")
+        if r["scope"] != "GLOBAL" and r["scope"] not in lines and r["scope"] not in mfrs:
+            P.err(w, f"scope must be GLOBAL, a product line code or a manufacturer code, got '{r['scope']}'")
+        rd = rule_defs.get(r["rule_key"])
+        if rd and rd["kind"] == "LIMIT" and r["value"] == "":
+            P.err(w, f"'{r['rule_key']}' is a limit and needs a value")
         if not r["statement"]:
             P.err(w, "statement is required")
         v, vmax = num(w, r, "value"), num(w, r, "value_max")
@@ -197,8 +241,17 @@ def build_shared():
                        "via_categories": pipe_list(r["via_categories"]), "note": r["note"] or None,
                        "source_ref": r["source_ref"] or None})
 
+    for code, line in lines.items():
+        if line["status"] != "ACTIVE":
+            continue
+        scopes = {"GLOBAL", code, line["manufacturer"]}
+        have = {x["key"] for x in rules if x["scope"] in scopes}
+        missing = sorted(k for k, d in rule_defs.items() if d["engine_uses"] and k not in have)
+        if missing:
+            P.err("catalog/shared/rules.csv", f"active line {code} has no rule for: {', '.join(missing)}")
+
     return dict(manufacturers=mfrs, sources=sources, product_lines=lines, categories=categories,
-                attribute_defs=attr_defs, rules=rules, line_compatibility=compat)
+                attribute_defs=attr_defs, rule_defs=rule_defs, rules=rules, line_compatibility=compat)
 
 
 # ---------------------------------------------------------------- one product line
@@ -377,8 +430,9 @@ def build_line(code, line, shared):
     noted = sum(1 for p in parts if p["note"])
     if noted:
         P.warn(f"catalog/lines/{code}/parts.csv", f"{noted} parts carry data-quality notes to resolve with the manufacturer")
-    return {"line": line, "sizes": list(sizes.values()), "parts": parts, "lookups": lookups,
-            "rules": [r for r in shared["rules"] if r["scope"] == code]}
+    return {"line": line, "manufacturer": shared["manufacturers"][line["manufacturer"]],
+            "sizes": list(sizes.values()), "parts": parts, "lookups": lookups,
+            "rules": [r for r in shared["rules"] if r["scope"] in (code, line["manufacturer"])]}
 
 
 # ---------------------------------------------------------------- main
@@ -422,6 +476,7 @@ def main():
         "product_lines": list(shared["product_lines"].values()),
         "categories": list(shared["categories"].values()),
         "attribute_defs": list(shared["attribute_defs"].values()),
+        "rule_defs": list(shared["rule_defs"].values()),
         "rules": [r for r in shared["rules"] if r["scope"] == "GLOBAL"],
         "line_compatibility": shared["line_compatibility"],
         "line_files": {c: f"{c}.json" for c in built},
@@ -429,7 +484,7 @@ def main():
     dump(OUT / "index.json", index)
     for c, b in built.items():
         dump(OUT / f"{c}.json", b)
-    print(f"\nBuild OK -> {OUT.relative_to(ROOT)}/  parts per line: {summary}")
+    print(f"\nBuild OK -> {_rel(OUT)}/  parts per line: {summary}")
     return 0
 
 

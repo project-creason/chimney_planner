@@ -47,3 +47,13 @@ URBAK,max_pitch_by_size,8:10
 8DT-06B,interior_only,1
 8DT-09B,interior_only,1
 8DT-12B,interior_only,1
+195802,cap_style,DIKAPT
+196802,cap_style,DIKAPT
+197802,cap_style,DIKAPT
+198802,cap_style,DIKAPT
+6DT-TC-2,trim_style,SQUARE
+6DT-TCR-2,trim_style,ROUND
+7DT-TC-2,trim_style,SQUARE
+7DT-TCR-2,trim_style,ROUND
+8DT-TC-2,trim_style,SQUARE
+8DT-TCR-2,trim_style,ROUND
