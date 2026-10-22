@@ -48,7 +48,8 @@ the catalog and rules as a whole; customer tables (part numbers, prices, stricte
 **Vercel (site + API):** `vercel.json` serves `web/` as the site and `api/` as the server, on the free Hobby plan.
 In Vercel choose **Add New → Project**, import this repository and leave the build settings as they are. Under
 **Settings → Environment Variables** add `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` (a read-only Turso token is
-enough; the site never writes), then redeploy. Every pull request gets its own preview address.
+enough; the site never writes), then redeploy. Every push to a pull request's branch after the import gets its own preview address
+(open it from **Deployments**); the production address shows `main`.
 
 The `web/` folder on its own is a static site and works on any static host (GitHub Pages, Netlify, Cloudflare
 Pages); there it plans in the browser.
