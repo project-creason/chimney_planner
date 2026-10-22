@@ -11,6 +11,8 @@
  *   readCustomer(db, code)                 the same sheets back, for export
  *   customerByKey(db, key)                 the customer a private link's key belongs to, or null
  *   customerPricing(db, code, today)       part numbers and the price list in effect today, keyed `line|order_number`
+ *   listCustomers(db)                      customers with their price lists and saved import layout, for the admin page
+ *   writePriceImport(db, ...)              saves a matched price sheet from the admin page (see server/price-import.mjs)
  *
  * Customer rows refer to parts by line + order number, never by row id, so a catalog import leaves them alone.
  * A customer's private link carries a random key; only its SHA-256 is stored (settings.access_key_sha256).
@@ -112,20 +114,40 @@ export function checkCustomer(sheets, catalogParts) {
 
 /** The catalog's parts, for checkCustomer. */
 export const catalogParts = db => all(db, 'SELECT line, order_number FROM parts ORDER BY line, sort');
+/** The same with stock numbers, which price sheets often use instead. */
+export const catalogPartsWithStock = db => all(db, 'SELECT line, order_number, stock_number FROM parts ORDER BY line, sort');
 
 /**
  * Saves a checked customer in one transaction: the customer row, all of its part numbers (replaced), and the
  * named price list (replaced; other price lists stay). Returns { key } when a new private-link key was made:
  * on the customer's first import, or with newKey. The key is not stored and can't be shown again.
  */
-export async function writeCustomer(db, { customer: c, parts, prices }, { newKey = false } = {}) {
-  const old = (await all(db, 'SELECT settings FROM customers WHERE code = ?', [c.code]))[0];
+async function settingsWithKey(db, code, newKey) {
+  const old = (await all(db, 'SELECT name, vertical, settings FROM customers WHERE code = ?', [code]))[0];
   const settings = old ? JSON.parse(old.settings || '{}') : {};
   let key = null;
   if (newKey || !settings.access_key_sha256) {
     key = randomBytes(18).toString('base64url');
     settings.access_key_sha256 = hashKey(key);
   }
+  return { old, settings, key };
+}
+
+/** Statements that replace one named price list with these prices. */
+function replacePriceList(code, { name, currency, effective_from, effective_to }, prices) {
+  const list = 'SELECT id FROM price_lists WHERE customer = ? AND name = ?';
+  return [
+    { sql: `DELETE FROM prices WHERE price_list_id IN (${list})`, args: [code, name] },
+    { sql: 'DELETE FROM price_lists WHERE customer = ? AND name = ?', args: [code, name] },
+    { sql: 'INSERT INTO price_lists (customer, name, currency, effective_from, effective_to) VALUES (?, ?, ?, ?, ?)',
+      args: [code, name, currency, effective_from ?? null, effective_to ?? null] },
+    ...prices.map(p => ({ sql: `INSERT INTO prices (price_list_id, line, order_number, price) SELECT id, ?, ?, ? FROM (${list})`,
+      args: [p.line, p.order_number, p.price, code, name] })),
+  ];
+}
+
+export async function writeCustomer(db, { customer: c, parts, prices }, { newKey = false } = {}) {
+  const { settings, key } = await settingsWithKey(db, c.code, newKey);
   const s = [
     { sql: `INSERT INTO customers (code, name, vertical, settings) VALUES (?, ?, ?, ?)
             ON CONFLICT (code) DO UPDATE SET name = excluded.name, vertical = excluded.vertical, settings = excluded.settings`,
@@ -134,19 +156,58 @@ export async function writeCustomer(db, { customer: c, parts, prices }, { newKey
     ...parts.map(p => ({ sql: 'INSERT INTO customer_parts (customer, line, order_number, sku, description) VALUES (?, ?, ?, ?, ?)',
       args: [c.code, p.line, p.order_number, p.sku, p.description] })),
   ];
-  if (c.price_list) {
-    const list = 'SELECT id FROM price_lists WHERE customer = ? AND name = ?';
-    s.push(
-      { sql: `DELETE FROM prices WHERE price_list_id IN (${list})`, args: [c.code, c.price_list] },
-      { sql: 'DELETE FROM price_lists WHERE customer = ? AND name = ?', args: [c.code, c.price_list] },
-      { sql: 'INSERT INTO price_lists (customer, name, currency, effective_from, effective_to) VALUES (?, ?, ?, ?, ?)',
-        args: [c.code, c.price_list, c.currency, c.effective_from, c.effective_to] },
-      ...prices.map(p => ({ sql: `INSERT INTO prices (price_list_id, line, order_number, price) SELECT id, ?, ?, ? FROM (${list})`,
-        args: [p.line, p.order_number, p.price, c.code, c.price_list] })),
-    );
-  }
+  if (c.price_list) s.push(...replacePriceList(c.code, { ...c, name: c.price_list }, prices));
   await db.batch(s, 'write');
   return { key };
+}
+
+/**
+ * Saves a price sheet matched by matchSheet. SKUs and descriptions in the sheet are added or updated (parts the
+ * sheet leaves out keep theirs); the named price list is replaced by the sheet's prices, when it has any.
+ * `layout` (the columns picked on the page) is remembered for the customer's next sheet.
+ * customer = { code, name, vertical }: a new code creates the customer and returns its private link key.
+ */
+export async function writePriceImport(db, { customer: c, priceList, matched, layout }) {
+  if (!CODE.test(c.code || '')) throw Object.assign(new Error('Customer code must be 2-20 letters, digits, - or _ (e.g. ACME).'), { status: 400 });
+  const { old, settings, key } = await settingsWithKey(db, c.code, false);
+  if (!old && !c.name) throw Object.assign(new Error('A new customer needs a name.'), { status: 400 });
+  if (c.vertical && !VERTICALS.includes(c.vertical)) throw Object.assign(new Error(`Vertical must be one of ${VERTICALS.join(', ')}.`), { status: 400 });
+  const prices = matched.filter(m => m.price != null);
+  if (prices.length) {
+    if (!priceList?.name) throw Object.assign(new Error('Name the price list.'), { status: 400 });
+    if (!/^[A-Z]{3}$/.test(priceList.currency || '')) throw Object.assign(new Error('Currency must be a 3-letter code such as USD.'), { status: 400 });
+    for (const k of ['effective_from', 'effective_to']) {
+      if (priceList[k] && !DATE.test(priceList[k])) throw Object.assign(new Error(`${k} must be a date like 2026-01-31.`), { status: 400 });
+    }
+  }
+  if (layout) settings.import_layout = layout;
+  const s = [
+    { sql: `INSERT INTO customers (code, name, vertical, settings) VALUES (?, ?, ?, ?)
+            ON CONFLICT (code) DO UPDATE SET name = excluded.name, vertical = excluded.vertical, settings = excluded.settings`,
+      args: [c.code, c.name || old.name, c.vertical ?? old?.vertical ?? null, JSON.stringify(settings)] },
+    ...matched.filter(m => m.sku).map(m => ({
+      sql: `INSERT INTO customer_parts (customer, line, order_number, sku, description) VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT (customer, line, order_number) DO UPDATE SET sku = excluded.sku,
+              description = coalesce(excluded.description, customer_parts.description)`,
+      args: [c.code, m.line, m.order_number, m.sku, m.description] })),
+  ];
+  if (prices.length) s.push(...replacePriceList(c.code, priceList, prices));
+  await db.batch(s, 'write');
+  return { key, skus: matched.filter(m => m.sku).length, prices: prices.length };
+}
+
+export async function listCustomers(db) {
+  const [customers, lists] = await Promise.all([
+    all(db, 'SELECT code, name, vertical, settings FROM customers ORDER BY name'),
+    all(db, `SELECT l.customer, l.name, l.currency, l.effective_from, l.effective_to, count(p.order_number) AS prices
+             FROM price_lists l LEFT JOIN prices p ON p.price_list_id = l.id GROUP BY l.id ORDER BY l.effective_from DESC`),
+  ]);
+  return customers.map(c => ({
+    code: c.code, name: c.name, vertical: c.vertical,
+    import_layout: JSON.parse(c.settings || '{}').import_layout ?? null,
+    price_lists: lists.filter(l => l.customer === c.code).map(l => ({ name: l.name, currency: l.currency,
+      effective_from: l.effective_from, effective_to: l.effective_to, prices: Number(l.prices) })),
+  }));
 }
 
 /** The price list in effect on `today` (YYYY-MM-DD): the latest start among those whose dates include it. */

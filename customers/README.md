@@ -6,7 +6,25 @@ numbers (SKUs), its own prices and a private link to the planner that shows them
 **Real customers' sheets are not committed.** This repository is public, so `.gitignore` keeps everything here
 except this file and the made-up `DEMO` customer. Keep real sheets somewhere private and import them from there.
 
-## The sheets
+## Importing a distributor's own price sheet (the easy way)
+
+Open `/admin.html` on the Vercel site and sign in with the admin password (`ADMIN_PASSWORD`, set in Vercel →
+Project → Settings → Environment Variables; without it the page is switched off). Upload the sheet as it came,
+Excel (.xlsx) or CSV, with any headers:
+
+1. Pick the customer, or create one (it gets its private link when you import).
+2. Upload the file. The page picks the sheet, the header row and the columns (manufacturer part number, their SKU,
+   price, description); change any that are wrong. A selling price (Sales Price, MSRP, List) is preferred over cost.
+3. Name the price list and the date it takes effect.
+4. Check the preview: how many rows match catalog parts, which catalog parts still have no price, which rows were
+   skipped and why. Part numbers match exactly, then ignoring case and punctuation, then after a `Vendor:` prefix,
+   then by stock number. Nothing is guessed: a row that matches nothing is skipped and listed.
+5. Import. SKUs in the sheet are added or updated (others are kept) and the named price list is replaced. The
+   column choices are remembered for that customer's next sheet.
+
+The sheets themselves never reach the repository; only what matches the catalog is stored in the database.
+
+## The sheets (command line)
 
 One folder per customer, three CSV files (Excel is fine; save as CSV):
 

@@ -17,7 +17,7 @@ plans; the results say which one made the plan ("worked out by the planning serv
 | `web/` | The website itself. This folder is what gets hosted. |
 | `customers/` | Retailers' and distributors' own part numbers and prices. Only the made-up `DEMO` is committed. See `customers/README.md`. |
 | `server/` | The API and database: `schema.sql`, CSV import and export, customer pricing, and the HTTP server. |
-| `api/` | The API as Vercel functions (`/api/lines`, `/api/plan`, `/api/customer`, `/api/health`), all running `server/app.mjs`. |
+| `api/` | The API as Vercel functions (`/api/lines`, `/api/plan`, `/api/customer`, `/api/health`, `/api/admin/*`), all running `server/app.mjs`. |
 | `tests/` | Automated tests for the planner and the form, plus 282 recorded plans every change must reproduce. |
 | `server/tests/` | Database and API tests (need `npm install`). |
 
@@ -46,7 +46,8 @@ Without settings, the server and import use a local file, `data/chimney.db`. To 
 `TURSO_DATABASE_URL` (`libsql://...`) and `TURSO_AUTH_TOKEN`, then run `npm run db:import`. The import replaces
 the catalog and rules as a whole; customer tables (part numbers, prices, stricter rules) are never touched by it.
 
-A customer's private link, `/?customer=<key>`, shows the plan with their SKUs, prices and a subtotal, and adds a
+Distributors' price sheets, in whatever layout they come, are loaded on `/admin.html` (needs `ADMIN_PASSWORD`
+set on the server; see `customers/README.md`). A customer's private link, `/?customer=<key>`, shows the plan with their SKUs, prices and a subtotal, and adds a
 "Download order" button (a CSV with SKU, manufacturer part number, quantity, unit price and line total). Only the
 server has customer data, so the GitHub Pages copy shows no prices.
 

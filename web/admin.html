@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Price Sheet Import</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<script>
+  try { if (localStorage.getItem('chimney-planner/theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch {}
+</script>
+<style>
+/* Admin page for loading a distributor's price sheet. Same palette and type as the planner (web/index.html). */
+:root {
+  --bg: #eef1f3; --surface: #ffffff; --sunken: #f5f7f8; --ink: #1b2228; --muted: #5a6770; --line: #d3dade;
+  --accent: #b9400f; --accent-ink: #ffffff; --accent-soft: #f9e6dc; --steel: #8996a0;
+  --ok: #2c7349; --warn: #8a5300; --warn-bg: #fff3dc; --warn-line: #e8c37d;
+  --crit: #a82418; --crit-bg: #fde7e4; --crit-line: #eba59d;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius: 6px; color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #11161a; --surface: #192026; --sunken: #141a1f; --ink: #e4e9ec; --muted: #98a5ae; --line: #2b353c;
+  --accent: #f07a45; --accent-ink: #1a0d06; --accent-soft: #3a2216; --steel: #6f7d87;
+  --ok: #68c18d; --warn: #e6b05a; --warn-bg: #2d2412; --warn-line: #6b5426;
+  --crit: #f2877b; --crit-bg: #33191a; --crit-line: #6e2f2c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px;
+  padding: 18px 20px 14px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.top h1 { font-size: 30px; font-weight: 700; line-height: 1; }
+.top h1 span { color: var(--accent); }
+.top p { margin: 0; color: var(--muted); font-size: 13px; }
+.top a { color: var(--muted); font-size: 13px; }
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.card h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+.card h2 small { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+.hint { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field label { font-size: 13px; font-weight: 600; }
+.field small { color: var(--muted); font-size: 12px; }
+input[type="text"], input[type="password"], input[type="date"], select {
+  width: 100%; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 7px 9px; }
+input[type="file"] { font-size: 14px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 7px 14px;
+  cursor: pointer; font-size: 14px; font-weight: 500; }
+.btn:hover { border-color: var(--steel); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+.row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+.banner { border: 1px solid; border-radius: var(--radius); padding: 10px 12px; font-size: 14px; }
+.banner p { margin: 0; }
+.banner.crit { background: var(--crit-bg); border-color: var(--crit-line); }
+.banner.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.banner.ok { background: var(--sunken); border-color: var(--line); }
+.banner.ok strong { color: var(--ok); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 4px 0 12px; }
+.stat { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; background: var(--sunken); }
+.stat b { display: block; font: 600 26px/1.1 var(--font-display); }
+.stat span { font-size: 12.5px; color: var(--muted); }
+.stat.good b { color: var(--ok); }
+.stat.bad b { color: var(--warn); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
+  font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line); background: var(--sunken); white-space: nowrap; }
+td { padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.code { font-family: var(--font-mono); font-size: 12.5px; white-space: nowrap; }
+th.picked { color: var(--accent); }
+td.picked { background: var(--accent-soft); }
+.tag { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 9px; border: 1px solid var(--line); color: var(--muted); }
+details { margin-top: 10px; }
+details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+details .table-wrap { margin-top: 8px; max-height: 360px; overflow: auto; }
+.link { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.link code { font-family: var(--font-mono); font-size: 13px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 4px; padding: 4px 8px; word-break: break-all; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div><h1>Price sheet <span>import</span></h1><p>Load a distributor's part numbers and prices for the planner.</p></div>
+  <a href="./">Back to the planner</a>
+</header>
+<main>
+  <section class="card" id="signIn">
+    <h2>Sign in</h2>
+    <p class="hint">Use the admin password set on the server (ADMIN_PASSWORD in Vercel).</p>
+    <form class="row" id="signInForm">
+      <div class="field" style="flex:1;min-width:200px"><label for="password">Admin password</label>
+        <input type="password" id="password" autocomplete="current-password" required></div>
+      <button class="btn primary" type="submit">Sign in</button>
+    </form>
+    <div id="signInMsg" style="margin-top:10px"></div>
+  </section>
+
+  <div id="work" hidden>
+    <section class="card">
+      <h2>1 · Customer</h2>
+      <p class="hint">Whose prices these are. A new customer gets a private planner link when you import.</p>
+      <div class="grid">
+        <div class="field"><label for="customer">Customer</label><select id="customer"></select></div>
+        <div class="field" data-new><label for="newCode">Code</label><input type="text" id="newCode" placeholder="ACME" maxlength="20">
+          <small>2-20 letters or digits, used in file names</small></div>
+        <div class="field" data-new><label for="newName">Name</label><input type="text" id="newName" placeholder="Acme Hearth Supply"></div>
+        <div class="field" data-new><label for="newVertical">Kind of business</label>
+          <select id="newVertical"><option value="RETAIL">Retailer</option><option value="DISTRIBUTOR">Distributor</option>
+            <option value="SERVICE">Service company</option><option value="MANUFACTURER">Manufacturer</option><option value="INSPECTOR">Inspector</option></select></div>
+      </div>
+      <p class="hint" id="customerLists" style="margin:10px 0 0"></p>
+    </section>
+
+    <section class="card">
+      <h2>2 · Price sheet</h2>
+      <p class="hint">Excel (.xlsx) or CSV, laid out any way. Rows for other products are fine: only the catalog's parts are used.</p>
+      <div class="grid">
+        <div class="field"><label for="file">File</label><input type="file" id="file" accept=".xlsx,.csv,text/csv"></div>
+        <div class="field" id="sheetField" hidden><label for="sheet">Sheet</label><select id="sheet"></select></div>
+        <div class="field" id="headerField" hidden><label for="headerRow">Header row</label><select id="headerRow"></select></div>
+      </div>
+      <div id="fileMsg" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card" id="columnsCard" hidden>
+      <h2>3 · Columns <small>guessed from the sheet; change any that are wrong</small></h2>
+      <div class="grid" id="columns"></div>
+      <div class="grid" style="margin-top:12px">
+        <div class="field"><label for="stripPrefix">Ignore a prefix on part numbers</label>
+          <input type="text" id="stripPrefix" placeholder="e.g. DUR">
+          <small>For sheets that write DUR6DT-48 for 6DT-48. "DuraVent:" style prefixes are handled already.</small></div>
+      </div>
+      <div class="table-wrap" style="margin-top:12px"><table id="sheetPreview"></table></div>
+    </section>
+
+    <section class="card" id="listCard" hidden>
+      <h2>4 · Price list</h2>
+      <p class="hint">Importing again with the same name replaces that list. Plans use the list in effect today; when several are, the one that started last.</p>
+      <div class="grid">
+        <div class="field"><label for="listName">Name</label><input type="text" id="listName" placeholder="2026 MSRP"></div>
+        <div class="field"><label for="currency">Currency</label><input type="text" id="currency" value="USD" maxlength="3"></div>
+        <div class="field"><label for="from">In effect from</label><input type="date" id="from"></div>
+        <div class="field"><label for="to">Until <small>(blank = no end)</small></label><input type="date" id="to"></div>
+      </div>
+    </section>
+
+    <section class="card" id="previewCard" hidden>
+      <h2>5 · Check and import</h2>
+      <div id="preview"><p class="hint">Working it out…</p></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn primary" type="button" id="import" disabled>Import</button>
+        <span class="hint" style="margin:0" id="importNote"></span>
+      </div>
+      <div id="result" style="margin-top:12px"></div>
+    </section>
+  </div>
+</main>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
