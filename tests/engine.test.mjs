@@ -531,3 +531,23 @@ test('a stricter global rule overrides the manufacturer, and other lines are ign
   assert.equal(c.rule('offset.max_count').value, 2);
   assert.equal(c.manufacturer.name, 'Duravent');
 });
+
+test('two offsets in a short attic plan with a STOP on each instead of crashing', () => {
+  const s = clone(EXAMPLE_RANCH);
+  s.route.offsets = [{ horizontalIn: 8 }, { horizontalIn: 12 }];
+  const r = planChimney(s, cat);
+  assert.ok(r.ok, r.errors.join('; '));
+  assert.equal(qty(r, '6DT-E30KSS'), 2);
+  assert.match(r.blockers[0], /^Offset 1 needs .* only about 15"/);
+  assert.match(r.blockers[1], /^Offset 2 needs .* only about 0" once the earlier offsets are in/);
+});
+
+test('two offsets with room for both pass without a STOP', () => {
+  const s = clone(EXAMPLE_RANCH);
+  s.route.offsets = [{ horizontalIn: 8 }, { horizontalIn: 12 }];
+  s.roof = { ...s.roof, penetrationElevationIn: 200, horizontalToRidgeFt: 12 };
+  const r = planChimney(s, cat);
+  assert.ok(r.ok, r.errors.join('; '));
+  assert.deepEqual(r.blockers, []);
+  assert.equal(qty(r, '6DT-E15KSS') + qty(r, '6DT-E30KSS'), 2);
+});
