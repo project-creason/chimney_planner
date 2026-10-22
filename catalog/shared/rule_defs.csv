@@ -4,6 +4,7 @@ flue.diameter_match_appliance,REQUIREMENT,,,1,Chimney diameter equals the applia
 offset.max_count,LIMIT,MAX,count,1,Most offsets (elbow pairs) allowed in one installation
 offset.max_elbow_angle_deg,LIMIT,MAX,deg,0,Steepest elbow angle from vertical
 offset.strap_per_offset,LIMIT,MIN,count,0,Elbow straps needed per offset
+offset.resupport_above_each,REQUIREMENT,,,1,"A support above each offset (two elbows); value 0 = not required, 1 = required"
 attic.shield_required,REQUIREMENT,,,1,Attic insulation shield wherever the chimney passes through an attic
 ceiling.firestop_required,REQUIREMENT,,,0,Firestop at each floor or ceiling penetration without a support box
 ceiling.pass_through_shield_above_fireplace,ADVICE,,,1,When the pass-through shield suits a ceiling above a fireplace
