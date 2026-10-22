@@ -8,9 +8,14 @@
     "test:engine": "node --test tests/*.test.mjs",
     "db:import": "node server/db/import.mjs",
     "db:export": "node server/db/export.mjs",
-    "server": "node server/index.mjs"
+    "server": "node server/index.mjs",
+    "dev": "node tools/dev_server.mjs",
+    "check:api": "node tools/check_api_parity.mjs"
   },
   "dependencies": {
     "@libsql/client": "0.18.0"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
