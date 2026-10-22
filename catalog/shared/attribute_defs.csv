@@ -13,3 +13,4 @@ includes_storm_collar,bool,,,ROOF_FLASHING|CHASE_VENT_CONE,The part comes with i
 includes_trim,bool,,,CEILING_SUPPORT_ROUND,The support comes with its ceiling trim; none is added separately
 max_supported_ft_by_size,map,,ft,,"Rated chimney height per size for a support that fits several sizes, as size:feet"
 also_categories,list,TEE_SUPPORT|WALL_STRAP_ADJ|OFFSET_SUPPORT|ROOF_SUPPORT|RESUPPORT,,,"Other jobs the same part does, so the planner finds it there too"
+install_note,text,,,STORM_COLLAR,"Installation note added wherever the part is listed, e.g. how to seal it"

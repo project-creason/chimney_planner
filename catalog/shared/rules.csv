@@ -11,7 +11,7 @@ wall.thimble_interior_projection_in,MANUFACTURER,DT,6,,in,"DuraTech pipe through
 wall.strap_interval_ft,MANUFACTURER,DT,8,,ft,Wall straps are required at 8 ft intervals along an exterior run.,Catalog p.16,0
 roof.bracket_threshold_ft,MANUFACTURER,DT,5,,ft,An extended roof bracket is required once 5 ft or more of chimney stands above the roof penetration.,"Catalog p.6, p.18",0
 roof.bracket_interval_ft,MANUFACTURER,DT,5,,ft,Add another roof bracket for each additional 5 ft.,Catalog p.6,0
-roof.storm_collar_with_flashing,MANUFACTURER,DT,,,,A storm collar is required with every roof flashing. Seal with 500°F non-hardening sealant.,"Catalog p.19, p.20",0
+roof.storm_collar_with_flashing,MANUFACTURER,DT,,,,A storm collar is required with every roof flashing.,"Catalog p.19, p.20",0
 term.min_above_penetration_ft,MANUFACTURER,DT,3,,ft,Chimney extends at least 3 ft above where it passes through the roof.,Catalog p.6 fig.1,0
 term.min_above_within_horizontal_ft,MANUFACTURER,DT,2,,ft,Chimney is at least 2 ft higher than any part of the building within the horizontal distance below.,Catalog p.6 fig.1,0
 term.horizontal_check_distance_ft,MANUFACTURER,DT,10,,ft,Horizontal radius used for the 2 ft rule.,Catalog p.6 fig.1,0
@@ -29,7 +29,7 @@ nfpa.single_wall_connector_clearance_in,NFPA211,GLOBAL,18,,in,"Unlisted single-w
 nfpa.flue_not_smaller_than_outlet,NFPA211,GLOBAL,,,,Chimney flue may not be smaller than the appliance flue collar.,NFPA 211 (edition adopted by AHJ) - section to confirm,0
 nfpa.termination_3_2_10,NFPA211,GLOBAL,,,,Termination height rule (3 ft above penetration / 2 ft above anything within 10 ft).,NFPA 211 (edition adopted by AHJ) - section to confirm,0
 appliance.must_approve_chimney,MANUFACTURER,DT,,,,Confirm with the appliance or fireplace manufacturer that DuraTech is approved for that model before attaching it.,Catalog p.17 (anchor plate),0
-chase.storm_collar_required,MANUFACTURER,DT,,,,Chase top flashing ships without a storm collar; add one where the chimney exits the chase. Seal with 500°F non-hardening sealant.,Catalog p.18,0
+chase.storm_collar_required,MANUFACTURER,DT,,,,Chase top flashing ships without a storm collar; add one where the chimney exits the chase.,Catalog p.18,0
 chase.min_cap_clearance_in,MANUFACTURER,DT,6,,in,"At a chase top, at least 6"" from the chase top flashing to the bottom of the cap. A minimum: never less.",L150 Rev.4 p.19 Fig.26; p.20 Fig.29,0
 termination.shroud_spec,MANUFACTURER,DT,,,,A decorative shroud over the termination keeps the UL listing only if built to Duravent shroud specification L157.,"Catalog p.4, p.6",0
 roof.radiation_shield_per_appliance,MANUFACTURER,DT,,,,A roof radiation shield may be required by the appliance manufacturer (notably some Canadian factory-built fireplaces).,Catalog p.13,0

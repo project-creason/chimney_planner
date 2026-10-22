@@ -711,6 +711,9 @@ function inFinish(cat, category, size, finish) {
   return () => true;
 }
 
+/** A reason followed by the part's own installation note, when it has one. */
+const withNote = (text, part) => (attr(part, 'install_note') ? `${text} ${attr(part, 'install_note')}` : text);
+
 /** How many feet of chimney a support carries in this size (some supports fit several sizes, rated per size). */
 function supportCapacityFt(part, size) {
   return attr(part, 'max_supported_ft_by_size')?.[size] ?? part.max_supported_ft;
@@ -764,7 +767,7 @@ function chaseTopFlashing(ctx, w, d) {
     plan.add(ctf, 1, 'Closes the top of the chase around the chimney; spacer clips vent the chase');
     if (!w || !d) plan.notes.push(`${ctf.order_number} covers a chase top up to ${fmt(covers)} × ${fmt(covers)}. Enter the chase size to check yours.`);
   }
-  if (cat.requires('chase.storm_collar_required')) plan.add(sc, 1, cat.rule('chase.storm_collar_required').statement);
+  if (cat.requires('chase.storm_collar_required')) plan.add(sc, 1, withNote(cat.rule('chase.storm_collar_required').statement, sc));
   return true;
 }
 
@@ -789,7 +792,7 @@ function customChaseCover(ctx, w, d) {
   if ((!cone || !attr(cone, 'includes_storm_collar')) && cat.requires('chase.storm_collar_required')) {
     const sc = plan.pick('STORM_COLLAR', size, () => true, 'storm collar');
     if (!sc) return false;
-    plan.add(sc, 1, cat.rule('chase.storm_collar_required').statement);
+    plan.add(sc, 1, withNote(cat.rule('chase.storm_collar_required').statement, sc));
   }
   return true;
 }
@@ -844,7 +847,7 @@ function roofPenetration(ctx) {
   plan.add(flashing, 1, `Weatherproofs the ${p12}/12 ${words(surface)} roof penetration`);
   if (!attr(flashing, 'includes_storm_collar') && cat.requires('roof.storm_collar_with_flashing')) {
     const sc = plan.pick('STORM_COLLAR', size, () => true, 'storm collar');
-    if (sc) plan.add(sc, 1, cat.rule('roof.storm_collar_with_flashing').statement);
+    if (sc) plan.add(sc, 1, withNote(cat.rule('roof.storm_collar_with_flashing').statement, sc));
   }
   ctx.exit = { elevationIn: spec.roof.penetrationElevationIn, pitch, label: 'roof penetration' };
 }
