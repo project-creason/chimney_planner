@@ -330,7 +330,9 @@ function planOffsets(ctx, offsets, spaces = []) {
   }
   const chart = cat.lookups.elbow_offsets || [];
   const inch = v => `${Math.round(v * 100) / 100}"`;
-  const roomiest = () => spaces.reduce((a, b) => (b.heightIn - b.used > (a ? a.heightIn - a.used : -1) ? b : a), null);
+  // the open space with the most height left; once earlier offsets have filled every space, still the one
+  // with the least overrun, so a later offset is checked against it instead of being planned blind
+  const roomiest = () => spaces.reduce((a, b) => (!a || b.heightIn - b.used > a.heightIn - a.used ? b : a), null);
 
   offsets.forEach((o, i) => {
     const n = i + 1;
@@ -349,7 +351,7 @@ function planOffsets(ctx, offsets, spaces = []) {
     }
     const measured = o.availableRiseIn > 0 ? o.availableRiseIn : null;
     const space = roomiest();
-    const estimated = measured == null && space ? space.heightIn - space.used : null;
+    const estimated = measured == null && space ? Math.max(0, space.heightIn - space.used) : null;
     const room = measured ?? estimated;
 
     let pick = chooseOffset(o.horizontalIn, chart, angles, room);
@@ -379,6 +381,7 @@ function planOffsets(ctx, offsets, spaces = []) {
       if (!p) { plan.errors.push(`No ${len}" pipe in ${finish} for the offset.`); return; }
       plan.add(p, 1, `Pipe between the elbows of offset ${n}`);
     }
+    const usedBefore = space ? space.used : 0;   // height earlier offsets already took from this space
     const atIn = space ? space.from + space.used : null;
     if (space) space.used += row.rise_in;
     ctx.offsetRiseIn += row.rise_in;
@@ -397,7 +400,7 @@ function planOffsets(ctx, offsets, spaces = []) {
         : `Offset ${n}: 15° elbows can't shift ${inch(o.horizontalIn)}, so 30° elbows are used.`);
     }
     if (tooTight) {
-      plan.issue('STOP', `Offset ${n} needs ${inch(row.rise_in)} of height even with ${row.angle_deg}° elbows, but the open space ${space.label} at the chimney looks like only about ${inch(estimated)} ` +
+      plan.issue('STOP', `Offset ${n} needs ${inch(row.rise_in)} of height even with ${row.angle_deg}° elbows, but the open space ${space.label} at the chimney looks like only about ${inch(estimated)}${usedBefore > 0 ? ' once the earlier offsets are in' : ''} ` +
         `(estimated with a ${FRAMING_ALLOWANCE_IN}" framing allowance). It may not fit. Measure the space and enter it as the height available, or reduce the shift.`,
         [kit?.order_number, ...parseBetween(row.between_desc).map(len => ctx.stock.find(p => p.nominal_length_in === len)?.order_number)].filter(Boolean));
     } else if (measured != null) {
