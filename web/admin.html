@@ -46,6 +46,15 @@ main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; display: flex
 .card h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
 .card h2 small { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 8px; }
 .hint { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+/* helper notes: what a step does and why, in plain words */
+.note { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; padding: 10px 12px; border-radius: var(--radius);
+  background: var(--sunken); border: 1px solid var(--line); font-size: 13.5px; }
+.note::before { content: "i"; flex: none; width: 18px; height: 18px; border-radius: 50%; margin-top: 1px;
+  display: grid; place-items: center; font: 600 12px/1 var(--font-body); color: var(--accent-ink); background: var(--steel); }
+.note p { margin: 0; }
+.note p + p { margin-top: 4px; }
+.note ul { margin: 4px 0 0; padding-left: 18px; }
+td.money { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
 .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .field label { font-size: 13px; font-weight: 600; }
@@ -110,7 +119,8 @@ details .table-wrap { margin-top: 8px; max-height: 360px; overflow: auto; }
   <div id="work" hidden>
     <section class="card">
       <h2>1 · Customer</h2>
-      <p class="hint">Whose prices these are. A new customer gets a private planner link when you import.</p>
+      <div class="note"><div><p>The retailer or distributor these prices are for. Each customer has its own part numbers and price lists, and its own private planner link that shows plans at its prices.</p>
+        <p>A new customer's link appears once, right after its first import. Copy it then and send it to them privately.</p></div></div>
       <div class="grid">
         <div class="field"><label for="customer">Customer</label><select id="customer"></select></div>
         <div class="field" data-new><label for="newCode">Code</label><input type="text" id="newCode" placeholder="ACME" maxlength="20">
@@ -125,7 +135,8 @@ details .table-wrap { margin-top: 8px; max-height: 360px; overflow: auto; }
 
     <section class="card">
       <h2>2 · Price sheet</h2>
-      <p class="hint">Excel (.xlsx) or CSV, laid out any way. Rows for other products are fine: only the catalog's parts are used.</p>
+      <div class="note"><div><p>Upload the sheet the way it came: Excel (.xlsx) or CSV, with any column names and any title rows above the headers.</p>
+        <p>Rows for other products are fine; only parts in our catalog are used. The file itself is not stored, only the matched parts' numbers and prices.</p></div></div>
       <div class="grid">
         <div class="field"><label for="file">File</label><input type="file" id="file" accept=".xlsx,.csv,text/csv"></div>
         <div class="field" id="sheetField" hidden><label for="sheet">Sheet</label><select id="sheet"></select></div>
@@ -136,18 +147,26 @@ details .table-wrap { margin-top: 8px; max-height: 360px; overflow: auto; }
 
     <section class="card" id="columnsCard" hidden>
       <h2>3 · Columns <small>guessed from the sheet; change any that are wrong</small></h2>
+      <div class="note"><div><p>Tell the page which column holds what. The highlighted columns in the sample below are the ones it will use.</p>
+        <ul><li><b>Manufacturer part number</b> is how each row is matched to our catalog (the order number, like 6DT-48SS, or the stock number). Required.</li>
+          <li><b>Customer part number (SKU)</b> is the customer's own number for the part. It appears on their plans and orders.</li>
+          <li><b>Customer price</b> is what plans and orders show. Pick the selling price (MSRP or list), not dealer cost. Prices are rounded to the cent.</li>
+          <li><b>Customer description</b> replaces our wording on their orders, when they have their own.</li></ul></div></div>
       <div class="grid" id="columns"></div>
-      <div class="grid" style="margin-top:12px">
-        <div class="field"><label for="stripPrefix">Ignore a prefix on part numbers</label>
-          <input type="text" id="stripPrefix" placeholder="e.g. DUR">
-          <small>For sheets that write DUR6DT-48 for 6DT-48. "DuraVent:" style prefixes are handled already.</small></div>
-      </div>
+      <details id="prefixBox">
+        <summary>Part numbers with an extra code in front (rarely needed)</summary>
+        <div class="note" style="margin-top:8px"><div><p>Some distributors put their own code in front of the manufacturer's number, for example <b>DUR6DT-48</b> for Duravent's 6DT-48. Enter that code (DUR) and it's taken off before matching.</p>
+          <p>You usually don't need this: the page spots such a code on its own and offers to ignore it, and a <b>DuraVent:6DT-48</b> style name is handled already.</p></div></div>
+        <div class="field" style="max-width:260px"><label for="stripPrefix">Code to ignore</label>
+          <input type="text" id="stripPrefix" placeholder="e.g. DUR"></div>
+      </details>
       <div class="table-wrap" style="margin-top:12px"><table id="sheetPreview"></table></div>
     </section>
 
     <section class="card" id="listCard" hidden>
       <h2>4 · Price list</h2>
-      <p class="hint">Importing again with the same name replaces that list. Plans use the list in effect today; when several are, the one that started last.</p>
+      <div class="note"><div><p>Prices are saved as a named list with the dates it applies, so next year's prices can be loaded ahead of time and old ones are kept.</p>
+        <p>Plans use the list in effect today; if several are, the one that started most recently. Importing again with the same name replaces that list.</p></div></div>
       <div class="grid">
         <div class="field"><label for="listName">Name</label><input type="text" id="listName" placeholder="2026 MSRP"></div>
         <div class="field"><label for="currency">Currency</label><input type="text" id="currency" value="USD" maxlength="3"></div>
@@ -158,6 +177,8 @@ details .table-wrap { margin-top: 8px; max-height: 360px; overflow: auto; }
 
     <section class="card" id="previewCard" hidden>
       <h2>5 · Check and import</h2>
+      <div class="note"><div><p>Check the numbers and a few rows below. Nothing is saved until you click Import.</p>
+        <p>Import adds or updates the customer's part numbers for the matched parts (others are kept) and replaces the named price list. Parts without a price show as "no price" on plans.</p></div></div>
       <div id="preview"><p class="hint">Working it out…</p></div>
       <div class="row" style="margin-top:14px">
         <button class="btn primary" type="button" id="import" disabled>Import</button>

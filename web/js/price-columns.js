@@ -5,6 +5,7 @@
  *
  *   findHeaderRow(rows)                         index of the header row in the first rows of the sheet
  *   guessColumns(headers, body, catalogCodes)   { part, sku, price, description }: column indexes or null
+ *   priceColumns(headers, body)                 the columns holding money, to show them as $0.00
  */
 export const FIELDS = ['part', 'sku', 'price', 'description'];
 
@@ -25,6 +26,19 @@ const HEADER_WORDS = {
   description: [[/\b(desc|description)\b/i, 3], [/\b(name|title|product)\b/i, 1]],
 };
 const headerScore = (field, h) => Math.max(0, ...HEADER_WORDS[field].map(([re, w]) => (re.test(String(h ?? '')) ? w : 0)));
+
+/** Columns that hold money (most filled cells read as a price), for showing them as $0.00. Counts and quantities aren't. */
+export function priceColumns(headers, body) {
+  const sample = body.slice(0, 300);
+  const out = new Set();
+  const width = sample.reduce((w, r) => Math.max(w, r.length), headers.length);
+  for (let i = 0; i < width; i++) {
+    if (/\b(qty|quantity|pack|count|weight|lbs?|case|min|uom|year)\b/i.test(String(headers[i] ?? ''))) continue;
+    const c = sample.map(r => r[i]).filter(filled);
+    if (c.length && c.filter(isPrice).length / c.length >= 0.6) out.add(i);
+  }
+  return out;
+}
 
 /** The header row is the early row that reads most like headers: several filled text cells, header words. */
 export function findHeaderRow(rows, scan = 15) {

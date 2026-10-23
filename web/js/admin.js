@@ -5,14 +5,15 @@
  */
 import { parseCsvRows } from './csv.js';
 import { readXlsx } from './xlsx-lite.js';
-import { FIELDS, findHeaderRow, guessColumns } from './price-columns.js';
+import { FIELDS, findHeaderRow, guessColumns, priceColumns } from './price-columns.js';
 
 const $ = sel => document.querySelector(sel);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const PASS_KEY = 'chimney-planner/admin-password';
 const NEW = '__new__';
-const LABELS = { part: 'Manufacturer part number', sku: "Their SKU / item number", price: 'Price', description: 'Description' };
-const HINTS = { part: 'Required. Order or stock number', sku: 'Optional', price: 'Optional', description: 'Optional, replaces ours on their orders' };
+const LABELS = { part: 'Manufacturer part number', sku: 'Customer part number (SKU)', price: 'Customer price', description: 'Customer description' };
+const HINTS = { part: 'Required: matches each row to the catalog', sku: 'Optional: shown on their plans and orders',
+  price: 'Optional: the selling price plans show', description: 'Optional: replaces ours on their orders' };
 
 let password = '';
 let customers = [];
@@ -150,6 +151,7 @@ function applyLayout() {
       if (saved.headers[f] === null) cols[f] = null; else if (i >= 0) cols[f] = i;
     }
     $('#stripPrefix').value = saved.strip_prefix || '';
+    $('#prefixBox').open = !!saved.strip_prefix;
   }
   renderColumns();
 }
@@ -187,8 +189,13 @@ function renderSheetPreview() {
   const width = Math.min(12, [headers, ...body].reduce((w, r) => Math.max(w, r.length), 0));
   const fieldOf = i => FIELDS.find(f => cols[f] === i);
   const idx = Array.from({ length: width }, (_, i) => i);
+  const moneyCols = priceColumns(headers, rows.slice(headerIdx + 1));
+  const cell = (v, i) => {
+    const n = parsePriceCell(v);
+    return moneyCols.has(i) && n !== null ? `<td class="money${fieldOf(i) ? ' picked' : ''}">${dollars(n)}</td>` : `<td class="${fieldOf(i) ? 'picked' : ''}">${esc(v ?? '')}</td>`;
+  };
   $('#sheetPreview').innerHTML = `<thead><tr>${idx.map(i => `<th class="${fieldOf(i) ? 'picked' : ''}">${colName(i)} ${esc(headers[i] ?? '')}${fieldOf(i) ? `<br>→ ${LABELS[fieldOf(i)]}` : ''}</th>`).join('')}</tr></thead>
-    <tbody>${body.map(r => `<tr>${idx.map(i => `<td class="${fieldOf(i) ? 'picked' : ''}">${esc(r[i] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    <tbody>${body.map(r => `<tr>${idx.map(i => cell(r[i], i)).join('')}</tr>`).join('')}</tbody>`;
 }
 
 // ------------------------------------------------------------------ preview and import
@@ -244,7 +251,19 @@ async function runPreview() {
   updateImportButton();
 }
 
-const money = v => (v == null ? '' : v.toFixed(2));
+/** 74.1965 -> $74.20 (in the price list's currency when it isn't dollars). */
+function dollars(v) {
+  if (v == null) return '';
+  const currency = /^[A-Z]{3}$/.test($('#currency').value.trim().toUpperCase()) ? $('#currency').value.trim().toUpperCase() : 'USD';
+  try { return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Math.round(v * 100) / 100); }
+  catch { return `${v.toFixed(2)} ${currency}`; }
+}
+const money = dollars;
+/** A sheet cell as a number, or null: "$1,234.50" and "74.1965" read, "662492006566" (a UPC) does not. */
+const parsePriceCell = v => {
+  const t = String(v ?? '').trim().replace(/[$,\s]/g, '');
+  return /^\d{1,7}(\.\d+)?$/.test(t) ? Number(t) : null;
+};
 const table = (head, rows) => `<div class="table-wrap"><table><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 const more = (shown, total) => (total > shown ? `<p class="hint" style="margin:6px 0 0">Showing the first ${shown} of ${total}.</p>` : '');
 
@@ -253,21 +272,21 @@ function renderPreview(r) {
   const catalogTotal = r.with_price + r.catalog_without_price;
   const parts = [];
   if (r.suggestion) {
-    parts.push(`<div class="banner warn" style="margin-bottom:10px"><p>${r.suggestion.rows} part numbers start with <b>${esc(r.suggestion.prefix)}</b> and match once it's taken off.
+    parts.push(`<div class="banner warn" style="margin-bottom:10px"><p>${r.suggestion.rows} part numbers start with an extra code, <b>${esc(r.suggestion.prefix)}</b>, and match our catalog once it's taken off.
       <button class="btn" type="button" id="usePrefix">Ignore ${esc(r.suggestion.prefix)}</button></p></div>`);
   }
   parts.push(`<div class="stats">
     ${stat(r.matched, `of ${r.rows} rows match catalog parts`, r.matched ? 'good' : 'bad')}
     ${cols.price !== null ? stat(r.with_price, 'prices to import', r.with_price ? 'good' : 'bad') : ''}
-    ${cols.sku !== null ? stat(r.with_sku, 'SKUs to import') : ''}
+    ${cols.sku !== null ? stat(r.with_sku, 'customer part numbers to import') : ''}
     ${cols.price !== null ? stat(r.catalog_without_price, `catalog parts still without a price (of ${catalogTotal})`, r.catalog_without_price ? 'bad' : 'good') : ''}
   </div>`);
   if (r.loose || r.by_stock_number) {
     parts.push(`<p class="hint">${[r.loose ? `${r.loose} matched after ignoring case, spaces, punctuation or a "Vendor:" prefix` : '',
       r.by_stock_number ? `${r.by_stock_number} matched by stock number` : ''].filter(Boolean).join('; ')}. Check a few below.</p>`);
   }
-  parts.push(table(['Row', 'In the sheet', 'Catalog part', 'SKU', 'Price', 'Description'], r.sample.slice(0, 12).map(m => `<tr>
-    <td class="num">${m.n}</td><td class="code">${esc(sheetPart(m.n))}</td><td class="code">${esc(m.order_number)}${m.loose ? ' <span class="tag">loose</span>' : ''}${m.via === 'stock' ? ' <span class="tag">stock #</span>' : ''}</td>
+  parts.push(table(['Row', 'In the sheet', 'Manufacturer part', 'Customer SKU', 'Customer price', 'Customer description'], r.sample.slice(0, 12).map(m => `<tr>
+    <td class="num">${m.n}</td><td class="code">${esc(sheetPart(m.n))}</td><td class="code">${esc(m.order_number)}${m.loose ? ' <span class="tag" title="Matched after ignoring case, spaces, punctuation or a code in front such as DuraVent:">near match</span>' : ''}${m.via === 'stock' ? ' <span class="tag" title="Matched by the manufacturer\'s stock number">by stock #</span>' : ''}</td>
     <td class="code">${esc(m.sku ?? '')}</td><td class="num">${money(m.price)}</td><td>${esc(m.description ?? '')}</td></tr>`)));
   parts.push(more(Math.min(12, r.sample.length), r.matched));
   if (r.catalog_without_price && cols.price !== null) {
@@ -293,7 +312,7 @@ function renderPreview(r) {
       ${more(r.unmatched_rows.length, r.unmatched)}</details>`);
   }
   $('#preview').innerHTML = parts.join('');
-  $('#usePrefix')?.addEventListener('click', () => { $('#stripPrefix').value = r.suggestion.prefix; schedulePreview(); });
+  $('#usePrefix')?.addEventListener('click', () => { $('#stripPrefix').value = r.suggestion.prefix; $('#prefixBox').open = true; schedulePreview(); });
 }
 const sheetPart = n => String(sheets[sheetIdx].rows[n - 1]?.[cols.part] ?? '');
 
@@ -319,7 +338,7 @@ async function runImport() {
     const r = await api('price-import', request(true));
     const code = request(false).customer.code;
     const link = r.saved.key ? `${location.origin}${location.pathname.replace(/admin\.html$/, '')}?customer=${r.saved.key}` : null;
-    $('#result').innerHTML = `<div class="banner ok"><p><strong>Imported.</strong> ${r.saved.prices} prices and ${r.saved.skus} SKUs saved for ${esc(code)}.
+    $('#result').innerHTML = `<div class="banner ok"><p><strong>Imported.</strong> ${r.saved.prices} prices and ${r.saved.skus} customer part numbers saved for ${esc(code)}.
       The column choices are remembered for this customer's next sheet.</p>
       ${link ? `<p style="margin-top:8px"><b>${esc(code)}'s private planner link.</b> It is shown only this once: copy it now and send it to them privately.</p>
         <div class="link"><code id="newLink">${esc(link)}</code><button class="btn" type="button" id="copyLink">Copy</button></div>` : ''}</div>`;
