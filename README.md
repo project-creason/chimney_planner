@@ -1,4 +1,4 @@
-# DuraTech Chimney Planner
+# Chimney Venting Planner
 
 Enter details about a home and a wood stove or factory-built fireplace, and get a complete Duravent
 DuraTech (5"–8") chimney parts list that follows Duravent's instructions and NFPA 211.
