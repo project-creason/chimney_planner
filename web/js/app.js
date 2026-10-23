@@ -5,6 +5,7 @@
  */
 import { offsetChoices } from './engine/geometry.js';
 import { connectPlanner } from './planner-source.js';
+import { orderCsv } from './order-csv.js';
 import { EXAMPLE_STATE, blankState, toSpec, fmtFtIn, passesThroughRoof, roofHeightIn, atticMethodApplies,
          deckUndersideIn, topCeilingIn } from './ui/form-model.js';
 
@@ -18,6 +19,8 @@ let planner = null;
 let state = loadState();
 let lastResult = null;
 let lastSpec = null;
+/** A customer's private link: ?customer=<key> shows their SKUs and prices (planning server only). */
+const customerKey = new URLSearchParams(location.search).get('customer');
 
 // ------------------------------------------------------------------ state helpers
 function merge(base, saved) {
@@ -356,8 +359,13 @@ function syncManualBox(setOpen = false) {
 
 $('#copy').addEventListener('click', async () => {
   if (!lastResult?.parts.length) return;
-  const text = ['Qty\tPart #\tStock #\tDescription',
-    ...lastResult.parts.map(p => `${p.qty}\t${p.order_number}\t${p.stock_number ?? ''}\t${p.description}`)].join('\n');
+  const order = lastResult.order;
+  const text = order
+    ? ['Qty\tSKU\tPart #\tDescription\tUnit price\tLine total',
+      ...order.items.map(i => `${i.qty}\t${i.sku ?? ''}\t${i.order_number}\t${i.description}\t${money(i.unit_price, '')}\t${money(i.line_total, '')}`),
+      `\t\t\tSubtotal\t\t${money(order.subtotal)}`].join('\n')
+    : ['Qty\tPart #\tStock #\tDescription',
+      ...lastResult.parts.map(p => `${p.qty}\t${p.order_number}\t${p.stock_number ?? ''}\t${p.description}`)].join('\n');
   const btn = $('#copy');
   const box = $('#copyFallback');
   try {
@@ -438,20 +446,18 @@ function partsCsv(r, spec) {
   // BOM so Excel reads ° and × correctly
   return '\ufeff' + [title.map(csvCell).join(','), ...figs, '', head.join(','), ...rows.map(row => row.map(csvCell).join(','))].join('\r\n') + '\r\n';
 }
-csvBtn.addEventListener('click', async () => {
-  if (!lastResult?.ok) return;
-  const slug = (lastSpec.appliance.label || 'chimney').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const filename = `duratech-${lastSpec.appliance.collarSizeIn}in-${slug}-parts.csv`;
-  const data = partsCsv(lastResult, lastSpec);
+/** Saves a file through the viewer's downloads permission when published, or as an ordinary download. */
+async function saveFile(btn, filename, data) {
+  const label = btn.textContent;
   if (downloads) {
     try {
       await downloads.save({ filename, data });
-      csvBtn.textContent = 'Saved';
+      btn.textContent = 'Saved';
     } catch (e) {
-      if (['unavailable', 'not_granted', 'capability_disabled', 'capability_removed'].includes(e?.code)) csvBtn.hidden = true;
-      else if (e?.code !== 'declined') csvBtn.textContent = 'Try again';
+      if (['unavailable', 'not_granted', 'capability_disabled', 'capability_removed'].includes(e?.code)) btn.hidden = true;
+      else if (e?.code !== 'declined') btn.textContent = 'Try again';
     }
-    setTimeout(() => { csvBtn.textContent = 'Download CSV'; }, 1800);
+    setTimeout(() => { btn.textContent = label; }, 1800);
   } else if (!window.claude) {
     // the planner hosted as its own website: an ordinary download
     const url = URL.createObjectURL(new Blob([data], { type: 'text/csv;charset=utf-8' }));
@@ -459,7 +465,29 @@ csvBtn.addEventListener('click', async () => {
     document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
+}
+const fileStem = () => {
+  const slug = (lastSpec.appliance.label || 'chimney').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return `${planner.line.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${lastSpec.appliance.collarSizeIn}in-${slug}`;
+};
+csvBtn.addEventListener('click', () => {
+  if (!lastResult?.ok) return;
+  saveFile(csvBtn, `${fileStem()}-parts.csv`, partsCsv(lastResult, lastSpec));
 });
+$('#orderCsv').addEventListener('click', () => {
+  if (!lastResult?.ok || !lastResult.order) return;
+  const label = lastSpec.appliance.label ? ` for ${lastSpec.appliance.label}` : '';
+  const customer = lastResult.order.customer;
+  saveFile($('#orderCsv'), `${fileStem()}-order-${customer.code.toLowerCase()}.csv`, orderCsv(lastResult.order, {
+    customer: customer.name, title: `${makerName()} ${planner.line.name} ${lastSpec.appliance.collarSizeIn}" chimney${label}` }));
+});
+
+/** 1234.5 -> $1,234.50 in the order's currency; `blank` when there is no price. */
+function money(v, blank = 'no price') {
+  if (v == null) return blank;
+  const currency = lastResult?.order?.currency || 'USD';
+  try { return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(v); } catch { return `${v.toFixed(2)} ${currency}`; }
+}
 
 // ------------------------------------------------------------------ planning + rendering
 const makerName = () => planner?.manufacturer?.name || 'the manufacturer';
@@ -606,7 +634,8 @@ function render(r, spec) {
     $('#offsetInfo').innerHTML = offs.map(o => `<li><b>Offset ${o.n}</b> · ${o.angleDeg}° elbows · ${fmtIn(o.offsetIn)} sideways` +
       ` · uses ${fmtFtIn(o.riseIn)} of height${o.availableRiseIn ? ` of ${fmtFtIn(o.availableRiseIn)} available` : ''}` +
       `${o.chosen === 'FORCED' ? ' · angle chosen by you' : ''}</li>`).join('');
-    renderParts(r.parts);
+    renderCustomer(r.order);
+    renderParts(r.parts, r.order);
     $('#diagram').innerHTML = diagram(r, spec);
   }
 
@@ -618,21 +647,49 @@ function render(r, spec) {
   $('#checks').innerHTML = r.checks.map(c => `<li><span class="tag ${c.status}">${c.status}</span><span>${esc(c.detail)}</span></li>`).join('');
 }
 
-function renderParts(parts) {
+/** Whose prices these are, or why a customer link isn't giving any. */
+function renderCustomer(order) {
+  const line = $('#customerLine');
+  const c = planner.customer;
+  if (order && c) {
+    const pl = c.price_list;
+    line.innerHTML = `Part numbers and prices for <b>${esc(c.name)}</b>` +
+      (pl ? ` · ${esc(pl.name)} (${esc(pl.currency)})` : ' · no price list in effect today');
+  } else if (planner.customerError) {
+    line.innerHTML = `${ICON.CAUTION}No customer prices: ${esc(planner.customerError)}`;
+  }
+  line.hidden = !((order && c) || planner.customerError);
+  $('#orderCsv').hidden = !order || (window.claude && !downloads);
+}
+
+function renderParts(parts, order) {
   const count = parts.reduce((t, p) => t + p.qty, 0);
   $('#partsCount').textContent = `${count} pieces, ${parts.length} part numbers`;
+  const priced = new Map((order?.items || []).map(i => [i.order_number, i]));
+  const cols = order ? 4 : 3;
   let zone = null;
   const rows = [];
   for (const p of parts) {
-    if (p.zone !== zone) { zone = p.zone; rows.push(`<tr class="zone"><td colspan="3">${esc(ZONE_NAMES[zone] || zone)}</td></tr>`); }
+    if (p.zone !== zone) { zone = p.zone; rows.push(`<tr class="zone"><td colspan="${cols}">${esc(ZONE_NAMES[zone] || zone)}</td></tr>`); }
+    const i = priced.get(p.order_number);
+    const pn = i?.sku
+      ? `${esc(i.sku)}<small>${esc(p.order_number)}</small>`
+      : `${esc(p.order_number)}${p.stock_number ? `<small>${esc(p.stock_number)}</small>` : ''}`;
+    const gaps = i && !p.non_catalog ? i.missing.map(m => `<span class="chip gap">no ${m === 'sku' ? 'SKU' : 'price'}</span>`).join('') : '';
     rows.push(`<tr${(p.flags || []).some(f => f.level === 'STOP') ? ' class="row-stop"' : ''}>
       <td class="qty">${p.qty}</td>
-      <td class="pn">${esc(p.order_number)}${p.stock_number ? `<small>${esc(p.stock_number)}</small>` : ''}</td>
-      <td>${(p.flags || []).map(f => ICON[f.level]).join('')}${esc(p.description)}${p.optional ? '<span class="chip">optional</span>' : ''}${p.non_catalog ? `<span class="chip">not a ${esc(makerName())} part</span>` : ''}
+      <td class="pn">${pn}</td>
+      <td>${(p.flags || []).map(f => ICON[f.level]).join('')}${esc(i?.description || p.description)}${p.optional ? '<span class="chip">optional</span>' : ''}${p.non_catalog ? `<span class="chip">not a ${esc(makerName())} part</span>` : ''}${gaps}
         <span class="why">${esc(p.reasons.join(' '))}</span>
-        ${(p.flags || []).map(f => `<span class="flag ${f.level.toLowerCase()}">${esc(f.text)}</span>`).join('')}</td></tr>`);
+        ${(p.flags || []).map(f => `<span class="flag ${f.level.toLowerCase()}">${esc(f.text)}</span>`).join('')}</td>
+      ${order ? `<td class="price">${i?.line_total != null ? `${money(i.line_total)}${p.qty > 1 ? `<small>${p.qty} × ${money(i.unit_price)}</small>` : ''}` : (p.non_catalog ? 'quote' : '–')}</td>` : ''}</tr>`);
   }
-  $('#parts').innerHTML = `<thead><tr><th>Qty</th><th>Part</th><th>Description</th></tr></thead><tbody>${rows.join('')}</tbody>`;
+  if (order) {
+    const unpriced = order.items.filter(i => i.line_total == null).length;
+    rows.push(`<tr class="total"><td></td><td></td><td>Subtotal${unpriced ? `<span class="why">${unpriced} part${unpriced > 1 ? 's' : ''} without a price ${unpriced > 1 ? 'are' : 'is'} not included</span>` : ''}</td>
+      <td class="price">${money(order.subtotal)}</td></tr>`);
+  }
+  $('#parts').innerHTML = `<thead><tr><th>Qty</th><th>${order ? 'SKU' : 'Part'}</th><th>Description</th>${order ? '<th class="price">Price</th>' : ''}</tr></thead><tbody>${rows.join('')}</tbody>`;
   $('#copyFallback').hidden = true;
 }
 
@@ -741,7 +798,7 @@ fillPitchOptions();
 writeControls();
 syncManualBox(true);
 applyVisibility();
-connectPlanner('DT')
+connectPlanner('DT', customerKey)
   .then(p => {
     planner = p;
     document.documentElement.dataset.planner = p.mode;

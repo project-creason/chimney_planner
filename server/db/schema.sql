@@ -208,6 +208,20 @@ CREATE TABLE IF NOT EXISTS prices (
   PRIMARY KEY (price_list_id, line, order_number)
 );
 
+-- Rows of an imported price sheet that matched no catalog part yet (other product lines, usually). They are kept
+-- so that when a line is added to the catalog, its parts pick up these SKUs and prices without a re-import
+-- (see promoteSavedRows in server/db/customer-store.mjs). price_list is '' for a sheet imported without prices.
+CREATE TABLE IF NOT EXISTS saved_sheet_rows (
+  customer    TEXT NOT NULL REFERENCES customers(code) ON DELETE CASCADE,
+  price_list  TEXT NOT NULL DEFAULT '',
+  row_n       INTEGER NOT NULL,          -- the row number in the sheet, as Excel shows it
+  part        TEXT NOT NULL,             -- as written in the sheet
+  sku         TEXT,
+  price       REAL,
+  description TEXT,
+  PRIMARY KEY (customer, price_list, row_n)
+);
+
 -- A customer may make a rule stricter, never looser; the server refuses a looser value on save.
 CREATE TABLE IF NOT EXISTS customer_rules (
   customer  TEXT NOT NULL REFERENCES customers(code) ON DELETE CASCADE,

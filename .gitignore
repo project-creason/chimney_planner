@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .DS_Store
 data/
+# a real customer's part numbers and prices stay out of this public repository; only the sample is kept
+customers/*
+!customers/README.md
+!customers/DEMO/

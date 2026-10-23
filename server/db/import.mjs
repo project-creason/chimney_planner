@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { connect, migrate, ROOT } from './connect.mjs';
 import { writeCatalog } from './catalog-store.mjs';
+import { promoteSavedRows } from './customer-store.mjs';
 
 /** Validates a catalog folder and returns the build ({ index, lines }); throws with the build's messages on failure. */
 export function buildCatalog(catalogDir = resolve(ROOT, 'catalog')) {
@@ -29,7 +30,11 @@ export function buildCatalog(catalogDir = resolve(ROOT, 'catalog')) {
 export async function importCatalog(db, catalogDir) {
   const build = buildCatalog(catalogDir);
   await migrate(db);
-  return writeCatalog(db, build, catalogDir || 'catalog');
+  const summary = await writeCatalog(db, build, catalogDir || 'catalog');
+  // price sheet rows kept for parts the catalog didn't have may match now
+  const promoted = await promoteSavedRows(db);
+  if (promoted) console.log(`${promoted} saved price sheet rows now match catalog parts and were added to their customers.`);
+  return summary;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
