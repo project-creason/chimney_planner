@@ -59,3 +59,5 @@ general.inspection_recommended,MANUFACTURER,XL,,,,Contact local building or fire
 appliance.must_approve_chimney,MANUFACTURER,XL,,,,"With a factory-built fireplace, the chimney and fireplace are tested as one system: follow the fireplace instructions.",XLUSA-II p.7,0
 chase.storm_collar_required,MANUFACTURER,XL,,,,Seal the chimney where it leaves the chase top with a storm collar.,XL-CAT p.17 (EVCC),0
 chase.min_cap_clearance_in,MANUFACTURER,XL,8,,in,"For chase installations, the chimney extends at least 8"" above the top of the chase.",XLUSA-II p.6,0
+attic.enclosed_vented_flashing,INDUSTRY,GLOBAL,0,,,"Where the chimney is boxed in through the attic, follow the chimney maker's instructions for venting the enclosure.",Planner default; a line that requires vented flashing sets 1,0
+attic.enclosed_vented_flashing,MANUFACTURER,XL,1,,,"If the chimney is enclosed in the attic, a radiation shield (ERS) goes at the attic joist with no storm collar, and the roof takes a vented flashing so air can move up through the enclosure.","XLUSA-II p.9; catalog p.17",0

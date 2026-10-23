@@ -32,6 +32,37 @@ test('ranch: square support hangs 3" below the ceiling and its storm collar make
   assert.equal(r.warnings.length, 0);           // supports carry a rated height, so no capacity warning
 });
 
+test('chimney boxed in through the attic: no storm collar at the attic floor, vented flashing on the roof', () => {
+  const r = planChimney(xl(RANCH, s => { s.route.atticEnclosed = true; }), cat);
+  assert.ok(r.ok, r.errors.join('; '));
+  assert.equal(qty(r, '6ESS'), 1);
+  assert.equal(qty(r, '6ESQSC'), 0);            // the enclosure, not a storm collar, keeps insulation out
+  assert.equal(qty(r, '6EFA'), 0);
+  assert.equal(qty(r, '6EVFA'), 1);             // vented 1/12-7/12, with its own storm collar...
+  assert.equal(qty(r, 'ESC'), 0);               // ...so none is added
+  assert.ok(r.checks.some(c => c.rule === 'attic.enclosed_vented_flashing' && c.status === 'PASS'));
+  assert.ok(r.notes.some(n => /air space inside the attic enclosure/.test(n)));
+  // a steep roof takes the 8/12-12/12 vented flashing
+  assert.equal(qty(planChimney(xl(RANCH, s => { s.route.atticEnclosed = true; s.roof.pitch = 10; }), cat), '6EVFB'), 1);
+  // with a floor above the support, the attic-floor radiation shield gets no storm collar either
+  const f = planChimney(xl(RANCH, s => { s.route.atticEnclosed = true; s.route.floorPenetrationsIn = [192]; s.roof.penetrationElevationIn = 300; }), cat);
+  assert.ok(f.ok, f.errors.join('; '));
+  assert.equal(qty(f, '6ERS'), 1);
+  assert.equal(qty(f, 'ESC'), 0);
+  assert.equal(qty(f, '6EVFA'), 1);
+});
+
+test('boxed in through the attic is ignored without an attic, and DuraTech gets a caution, not a vented flashing', () => {
+  const r = planChimney(xl(RANCH, s => { s.route.atticEnclosed = true; s.route.atticAbove = false; }), cat);
+  assert.equal(qty(r, '6EVFA'), 0);
+  assert.equal(qty(r, '6EFA'), 1);
+  const dtCat = makeCatalog(index, load('DT.json'));
+  const plain = planChimney(structuredClone(EXAMPLE_RANCH), dtCat);
+  const dt = planChimney({ ...structuredClone(EXAMPLE_RANCH), route: { ...EXAMPLE_RANCH.route, atticEnclosed: true } }, dtCat);
+  assert.deepEqual(dt.parts, plain.parts);
+  assert.ok(dt.warnings.some(w => /DuraTech has no vented flashing in this catalog/.test(w)));
+});
+
 test('round support takes the universal storm collar and includes its trim', () => {
   const r = planChimney(xl(RANCH, s => { s.route.ceiling.support = 'ROUND'; }), cat);
   assert.ok(r.ok, r.errors.join('; '));
