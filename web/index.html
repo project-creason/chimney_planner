@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
 <title>Chimney Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -217,6 +218,13 @@ table.parts { width: 100%; border-collapse: collapse; font-size: 14px; }
 .parts td.pn small { display: block; color: var(--muted); font-size: 11px; }
 .parts .why { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
 .parts tr.zone td { padding: 12px 8px 4px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; border-bottom: 0; }
+.parts td.price { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.parts td.price small { display: block; color: var(--muted); font-size: 11px; }
+.parts th.price { text-align: right; }
+.parts tr.total td { font-weight: 600; border-bottom: 0; }
+.chip.gap { border-color: var(--warn-line); background: var(--warn-bg); color: var(--warn); }
+.customer { margin: -4px 0 10px; font-size: 13.5px; color: var(--muted); }
+.customer b { color: var(--ink); font-weight: 600; }
 .chip { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 9px; border: 1px solid var(--line); color: var(--muted); margin-left: 6px; vertical-align: 1px; }
 .copybox { width: 100%; min-height: 120px; font: 12px var(--font-mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 5px; padding: 8px; }
 
@@ -851,6 +859,7 @@ svg [hidden] { display: none; }
       <div id="status"><p class="loading">Loading the catalog…</p></div>
       <div id="summary" hidden>
         <p class="maker" id="maker"></p>
+        <p class="customer" id="customerLine" hidden></p>
         <dl class="figures" id="figures"></dl>
         <p class="governing" id="governing"></p>
         <ul class="offset-info" id="offsetInfo" hidden></ul>
@@ -863,6 +872,7 @@ svg [hidden] { display: none; }
             <span class="head-btns">
               <button class="btn" type="button" id="copy">Copy list</button>
               <button class="btn primary" type="button" id="csv">Download CSV</button>
+              <button class="btn primary" type="button" id="orderCsv" hidden>Download order</button>
             </span>
           </div>
           <div class="table-wrap"><table class="parts" id="parts"></table></div>
