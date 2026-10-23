@@ -488,6 +488,10 @@ svg [hidden] { display: none; }
               <p class="hint">From the stove room's ceiling to the second floor's surface. Usually 10"–14".</p>
             </div>
           </div>
+          <div data-when="ceiling.style=FLAT;ceiling.above=ATTIC|STORY_ATTIC" data-needs="ROOF_FLASHING_VENTED">
+            <label class="check"><input type="checkbox" id="ceiling-enclosed" name="ceiling.enclosed"> The chimney is boxed in through the attic</label>
+            <p class="hint">Framed and closed in around the chimney, not open to the attic. <span data-fill="line">EXCEL</span> then needs a vented roof flashing.</p>
+          </div>
           <label class="check"><input type="checkbox" id="ceiling-reduced" name="ceiling.reduced"> Joists are 12" on center (reduced-clearance box, 6" only)</label>
           <div class="field">
             <span class="label">Where it comes out</span>
@@ -591,6 +595,10 @@ svg [hidden] { display: none; }
             </div>
           </div>
           <label class="check"><input type="checkbox" id="fireplace-attic" name="fireplace.attic"> The chimney passes through an attic</label>
+          <div data-when="fireplace.attic=true" data-needs="ROOF_FLASHING_VENTED">
+            <label class="check"><input type="checkbox" id="fireplace-enclosed" name="fireplace.enclosed"> The chimney is boxed in through the attic</label>
+            <p class="hint">Framed and closed in around the chimney, not open to the attic. <span data-fill="line">EXCEL</span> then needs a vented roof flashing.</p>
+          </div>
           <div class="field jog">
             <span class="label">Does the chimney go straight up?</span>
             <div class="seg" role="radiogroup" aria-label="Straight up or offset">

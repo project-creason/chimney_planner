@@ -232,7 +232,7 @@ function planCeilingRoute(ctx) {
   }
   // the shielding at the attic floor: the support box itself, or the firestop of the highest floor above it
   const atticFloorPart = floorPenetrationsIn.length ? ctx.lastShield : support;
-  atticShield(ctx, atticAbove, !!attr(atticFloorPart, 'functions_as_attic_shield'),
+  atticShield(ctx, atticAbove && !atticEnclosure(ctx, atticAbove, floorPenetrationsIn.length ? 'radiation shield at the attic floor' : 'support box'), !!attr(atticFloorPart, 'functions_as_attic_shield'),
     floorPenetrationsIn.length ? 'radiation shield at the attic floor' : attr(support, 'attic_seal_category') ? 'support box' : 'support box collar', atticFloorPart);
   // the support box sits above the ceiling, so open space starts at its top
   planOffsets(ctx, offsets, openSpaces(ctx.startElevationIn + (support.height_in ?? 0), floorPenetrationsIn, roofPen,
@@ -289,6 +289,25 @@ function floorShields(ctx, elevations, topLimitIn, kind) {
     plan.add(s, 1, `Floor/ceiling penetration at ${ft(e)} ft without a support box`);
     ctx.lastShield = s;
   }
+  return true;
+}
+
+/**
+ * A chimney boxed in through the attic (spec.route.atticEnclosed). Where the line calls for it, the enclosure
+ * replaces the storm collar at the attic floor and the roof takes a vented flashing. Returns true when that
+ * applies, so the usual attic shield step is skipped.
+ */
+function atticEnclosure(ctx, atticAbove, byWhat) {
+  const { spec, cat, plan } = ctx;
+  if (!atticAbove || !spec.route.atticEnclosed) return false;
+  if (!cat.requires('attic.enclosed_vented_flashing')) {
+    plan.issue('CAUTION', `The chimney is boxed in through the attic. ${cat.line.name} has no vented flashing in this catalog; ${cat.rule('attic.enclosed_vented_flashing').statement.charAt(0).toLowerCase()}${cat.rule('attic.enclosed_vented_flashing').statement.slice(1)}`);
+    return false;
+  }
+  ctx.ventedFlashing = true;
+  plan.checks.push({ rule: 'attic.enclosed_vented_flashing', status: 'PASS',
+    detail: `Chimney enclosed in the attic: no storm collar on the ${byWhat}, and a vented roof flashing lets air move up through the enclosure.` });
+  plan.notes.push(`Keep the ${cat.rule('clearance.combustibles_in').value}" air space inside the attic enclosure and don't fill it with insulation.`);
   return true;
 }
 
@@ -558,7 +577,7 @@ function planFireplaceRoute(ctx) {
   const floors = r.floorPenetrationsIn || [];
   if (!floorShields(ctx, floors, exitElev, shieldKind)) return;
   if (shieldKind === 'PASS_THROUGH' && floors.length) plan.notes.push(cat.rule('ceiling.pass_through_shield_above_fireplace').statement);
-  atticShield(ctx, !!r.atticAbove, floors.length > 0 && !!attr(ctx.lastShield, 'functions_as_attic_shield'),
+  atticShield(ctx, !!r.atticAbove && !atticEnclosure(ctx, !!r.atticAbove, 'radiation shield at the attic floor'), floors.length > 0 && !!attr(ctx.lastShield, 'functions_as_attic_shield'),
     attr(ctx.lastShield, 'attic_seal_category') ? 'radiation shield at the attic floor' : 'pass-through shield top', ctx.lastShield);
   if (r.atticAbove && !floors.length) plan.warnings.push('An attic above the fireplace implies at least one ceiling penetration; add its elevation so a shield is included.');
 
@@ -838,13 +857,17 @@ function roofPenetration(ctx) {
   const p12 = Math.round(pitch);
   const fits = p => p.pitch_applies_to === 'roof' && p12 >= p.pitch_min && p12 <= p.pitch_max &&
     (attr(p, 'max_pitch_by_size')?.[size] == null || p12 <= attr(p, 'max_pitch_by_size')[size]);
-  const flashings = cat.parts('ROOF_FLASHING', size).filter(fits);
+  const vented = !!ctx.ventedFlashing;
+  const flashings = cat.parts(vented ? 'ROOF_FLASHING_VENTED' : 'ROOF_FLASHING', size).filter(fits);
   let flashing;
-  if (surface === 'SHINGLE') flashing = flashings.find(p => !p.optional && !attr(p, 'roof_surface'));
+  if (vented) flashing = flashings[0];
+  else if (surface === 'SHINGLE') flashing = flashings.find(p => !p.optional && !attr(p, 'roof_surface'));
   else if (surface === 'METAL_CORRUGATED') flashing = flashings.find(p => attr(p, 'roof_surface') === 'METAL_CORRUGATED') || flashings.find(p => attr(p, 'roof_surface') === 'METAL_OR_TILE');
   else if (surface === 'TILE') flashing = flashings.find(p => attr(p, 'roof_surface') === 'TILE') || flashings.find(p => attr(p, 'roof_surface') === 'METAL_OR_TILE');
-  if (!flashing) { plan.fail(`No ${size}" flashing for a ${p12}/12 ${words(surface)} roof.`, ['roof.pitch', 'roof.surface']); return; }
-  plan.add(flashing, 1, `Weatherproofs the ${p12}/12 ${words(surface)} roof penetration`);
+  if (!flashing) { plan.fail(`No ${size}" ${vented ? 'vented ' : ''}flashing for a ${p12}/12 ${words(surface)} roof.`, ['roof.pitch', 'roof.surface']); return; }
+  plan.add(flashing, 1, vented ? `Weatherproofs the ${p12}/12 roof penetration and vents the attic enclosure: ${cat.rule('attic.enclosed_vented_flashing').statement}`
+    : `Weatherproofs the ${p12}/12 ${words(surface)} roof penetration`);
+  if (vented && surface !== 'SHINGLE') plan.issue('CAUTION', `${cat.line.name}'s vented flashing is made for shingle-type roofs; check with ${cat.manufacturer.name} how to flash a ${words(surface)} roof over an attic enclosure.`);
   if (!attr(flashing, 'includes_storm_collar') && cat.requires('roof.storm_collar_with_flashing')) {
     const sc = plan.pick('STORM_COLLAR', size, () => true, 'storm collar');
     if (sc) plan.add(sc, 1, withNote(cat.rule('roof.storm_collar_with_flashing').statement, sc));

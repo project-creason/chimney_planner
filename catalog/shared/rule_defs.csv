@@ -6,6 +6,7 @@ offset.max_elbow_angle_deg,LIMIT,MAX,deg,0,Steepest elbow angle from vertical
 offset.strap_per_offset,LIMIT,MIN,count,0,Elbow straps needed per offset
 offset.resupport_above_each,REQUIREMENT,,,1,"A support above each offset (two elbows); value 0 = not required, 1 = required"
 attic.shield_required,REQUIREMENT,,,1,Attic insulation shield wherever the chimney passes through an attic
+attic.enclosed_vented_flashing,REQUIREMENT,,,1,"A chimney boxed in through the attic takes a vented roof flashing instead of a storm collar at the attic floor; value 0 = no such rule, 1 = required"
 ceiling.firestop_required,REQUIREMENT,,,0,Firestop at each floor or ceiling penetration without a support box
 ceiling.pass_through_shield_above_fireplace,ADVICE,,,1,When the pass-through shield suits a ceiling above a fireplace
 wall.thimble_with_pipe,REQUIREMENT,,,0,Every through-the-wall run uses a wall thimble

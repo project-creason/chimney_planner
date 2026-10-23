@@ -3,13 +3,13 @@ functions_as_attic_shield,bool,,,CEILING_SUPPORT_SQUARE|CEILING_SUPPORT_SQUARE_C
 reduced_clearance,bool,,,CEILING_SUPPORT_SQUARE|CEILING_SUPPORT_SQUARE_COLLAR,Narrower box for tighter framing (12 in on-center)
 accepts_connector,list,SINGLE_WALL|DOUBLE_WALL,,CEILING_SUPPORT_SQUARE|CEILING_SUPPORT_SQUARE_COLLAR|CEILING_SUPPORT_ROUND|CEILING_SUPPORT_FLAT|FINISHING_COLLAR,Stovepipe types the integrated flue extension accepts
 roof_surface,enum,METAL_CORRUGATED|METAL_OR_TILE|TILE,,ROOF_FLASHING,Roof surface a specialty flashing is designed for; absent = standard shingle roof
-max_pitch_by_size,map,,pitch,ROOF_FLASHING,"Per-size pitch limit overriding pitch_max, as size:pitch"
+max_pitch_by_size,map,,pitch,ROOF_FLASHING|ROOF_FLASHING_VENTED,"Per-size pitch limit overriding pitch_max, as size:pitch"
 interior_only,bool,,,CHIMNEY_PIPE,Painted section intended for interior use only
 also_fits_sizes,text,,in,SNOW_SPLITTER,Sizes outside this product line the part also fits
 cap_style,enum,STANDARD|DIKAPT|DELUXE|REVOLVING,,CAP,Cap design; absent = STANDARD
 trim_style,enum,ROUND|SQUARE,,TRIM_COLLAR_ROUND_BOX,Shape of the trim collar's outer edge
 attic_seal_category,enum,STORM_COLLAR|STORM_COLLAR_SQUARE,,CEILING_SUPPORT_SQUARE|CEILING_SUPPORT_ROUND|FIRESTOP,"When this part serves as the attic shield, the storm collar that must close its top"
-includes_storm_collar,bool,,,ROOF_FLASHING|CHASE_VENT_CONE,The part comes with its storm collar; none is added separately
+includes_storm_collar,bool,,,ROOF_FLASHING|ROOF_FLASHING_VENTED|CHASE_VENT_CONE,The part comes with its storm collar; none is added separately
 includes_trim,bool,,,CEILING_SUPPORT_ROUND,The support comes with its ceiling trim; none is added separately
 max_supported_ft_by_size,map,,ft,,"Rated chimney height per size for a support that fits several sizes, as size:feet"
 also_categories,list,TEE_SUPPORT|WALL_STRAP_ADJ|OFFSET_SUPPORT|ROOF_SUPPORT|RESUPPORT,,,"Other jobs the same part does, so the planner finds it there too"

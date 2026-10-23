@@ -53,6 +53,8 @@
  * @property {number[]} [floorPenetrationsIn]  Elevations of further floor/ceiling assemblies the
  *                                          chimney passes through above the support box (2nd story etc.).
  * @property {boolean} atticAbove            True if the chimney passes through an attic before the roof.
+ * @property {boolean} [atticEnclosed]       The chimney is boxed in (framed around) through the attic; lines that
+ *                                          require it take a vented roof flashing (rule attic.enclosed_vented_flashing).
  * @property {boolean} [throughLivingSpace]  The chimney passes through an occupied room above the stove
  *                                          (e.g. a second floor); the plan asks for it to be enclosed there.
  * @property {string[]} [floorLabels]        Display names for floorPenetrationsIn (diagram labels).
@@ -93,6 +95,7 @@
  * @property {'FIRESTOP'|'PASS_THROUGH'} [penetrationShield]  Default FIRESTOP. PASS_THROUGH (6-8")
  *                                          also serves as the attic shield at the top level.
  * @property {boolean} [atticAbove]
+ * @property {boolean} [atticEnclosed]       As for the ceiling route.
  * @property {Offset[]} [offsets]
  * @property {{type:'CHASE', chaseTopElevationIn:number, airIntake?:boolean, shroud?:boolean}
  *          | {type:'ROOF'}} exit           CHASE = exits the top of a framed chase; ROOF = through a roof.

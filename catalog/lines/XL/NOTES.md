@@ -6,6 +6,8 @@ Loaded from the ICC catalog **XL-CAT-2026_01** (EXCEL pages 8-20) and the US ins
 
 ## To confirm with ICC
 
+David's calls (2026-10-23): keep items 1, 2, 5 and 6 as below; 5" EXCEL (items 3, 4) is parked for now.
+
 1. **Installed length.** Catalog p.10 says to deduct 1 1/2" per length, but its table deducts 1 3/4" (48" → 46 1/4").
    The line uses 1 3/4", which never leaves a chimney short.
 2. **Order codes.** Where the catalog gives only a code (rain caps ERC/EDRC/ERRC, spark screen ERCS, locking band ELB,
@@ -18,10 +20,16 @@ Loaded from the ICC catalog **XL-CAT-2026_01** (EXCEL pages 8-20) and the US ins
 6. **Offset table misprint.** Catalog p.20, 5" with a 36" length (15°: 38 1/2" rise, 30°: 33 3/4") breaks the pattern of
    the other sizes; that row is left out. The manual's adjustable-length table (p.14) has a similar slip for 7", 30°.
 
+## Vented flashing
+
+A chimney boxed in through the attic ("The chimney is boxed in through the attic" on the form) gets no storm
+collar at the attic floor and a vented flashing (EVF, EVFA, EVFB, EVFC) on the roof, per manual p.9. There is no
+5" vented flashing, so a 5" enclosed chimney is refused. A chimney in a combustible chase already gets the vented
+chase cone (EVCC).
+
 ## Not planned yet
 
 - The 18" adjustable length (ELA18) between elbows: offsets use the fixed-length table only.
-- Vented flashing (EVF) where the chimney is enclosed in the attic or a combustible chase: the form doesn't ask.
 - A radiation shield (ERS) at the roof on a wall-route chimney that goes through the overhang.
 - The 8 ft limit on unsupported offset runs (every run in the table is shorter).
 - EXCEL gives no minimum chimney height for draft, so without the appliance manual's figure only the roof rules

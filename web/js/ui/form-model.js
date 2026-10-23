@@ -12,11 +12,11 @@ export const EXAMPLE_STATE = {
   },
   route: 'CEILING',
   ceiling: { style: 'FLAT', ft: 8, in: 0, pitch: 6, support: 'SQUARE', roundTrim: 'ROUND', reduced: false,
-             above: 'ATTIC', storyFt: 8, storyIn: 0, floorThickIn: 12,
+             above: 'ATTIC', enclosed: false, storyFt: 8, storyIn: 0, floorThickIn: 12,
              exit: 'ROOF', jog: 'STRAIGHT', floors: [], offsets: [{ in: null, room: null, angle: 'AUTO' }] },
   wall: { thickness: 6, cladding: 'VINYL', thimble: 'STANDARD', centerFt: 5, centerIn: 0, standoff: 2,
           collarToWall: null, roomCeilingFt: 8, roomCeilingIn: 0, topFt: 9, topIn: 0, eave: 'NONE' },
-  fireplace: { exit: 'CHASE', shield: 'FIRESTOP', attic: false,
+  fireplace: { exit: 'CHASE', shield: 'FIRESTOP', attic: false, enclosed: false,
                jog: 'STRAIGHT', floors: [], offsets: [{ in: null, room: null, angle: 'AUTO' }] },
   /** The framed chase the chimney exits, when any route uses one. Sizes are the chase's outside top. */
   chase: { topFt: 15, topIn: 0, widthIn: null, depthIn: null, airIntake: false, shroud: false,
@@ -188,6 +188,7 @@ export function toSpec(state) {
     const f = state.fireplace;
     spec.route = {
       type: 'FIREPLACE', floorPenetrationsIn: floors(f.floors), penetrationShield: f.shield, atticAbove: !!f.attic,
+      ...(f.attic && f.enclosed ? { atticEnclosed: true } : {}),
       offsets: offsets(f.jog, f.offsets),
       exit: f.exit === 'CHASE' ? chaseExit : { type: 'ROOF' },
     };
@@ -217,6 +218,7 @@ export function toSpec(state) {
                  support: ce.style === 'CATHEDRAL' ? 'SQUARE' : ce.support, roundTrim: ce.roundTrim, reducedClearance: !!ce.reduced },
       floorPenetrationsIn: upper, floorLabels: upper.map(() => 'Second-floor ceiling'),
       atticAbove: above === 'ATTIC' || above === 'STORY_ATTIC',
+      ...((above === 'ATTIC' || above === 'STORY_ATTIC') && ce.enclosed ? { atticEnclosed: true } : {}),
       throughLivingSpace: above === 'STORY_ATTIC' || above === 'STORY_ROOF',
       offsets: offsets(ce.jog, ce.offsets),
       exit: ce.exit === 'CHASE' ? chaseExit : { type: 'ROOF' },
