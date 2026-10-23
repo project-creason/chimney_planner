@@ -18,11 +18,15 @@ Excel (.xlsx) or CSV, with any headers:
 3. Name the price list and the date it takes effect.
 4. Check the preview: how many rows match catalog parts, which catalog parts still have no price, which rows were
    skipped and why. Part numbers match exactly, then ignoring case and punctuation, then after a `Vendor:` prefix,
-   then by stock number. Nothing is guessed: a row that matches nothing is skipped and listed.
+   then by stock number. Nothing is guessed: a row that matches nothing is listed and kept for later (below).
 5. Import. SKUs in the sheet are added or updated (others are kept) and the named price list is replaced. The
    column choices are remembered for that customer's next sheet.
 
-The sheets themselves never reach the repository; only what matches the catalog is stored in the database.
+Rows for parts the catalog doesn't have yet (usually other product lines on the same sheet) are kept in the
+database with their price list. When `npm run db:import` adds a line whose parts match them, they become the
+customer's SKUs and prices automatically, without importing the sheet again.
+
+The sheets themselves never reach the repository; only their rows are stored, in the database.
 
 ## The sheets (command line)
 

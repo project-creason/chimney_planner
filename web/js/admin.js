@@ -79,7 +79,8 @@ function customerChanged() {
   $('#customerLists').innerHTML = c
     ? (c.price_lists.length
       ? `Price lists: ${c.price_lists.map(l => `<b>${esc(l.name)}</b> (${l.prices} prices, ${esc(l.currency)}, from ${esc(l.effective_from || 'always')}${l.effective_to ? ` to ${esc(l.effective_to)}` : ''})`).join(' · ')}`
-      : 'No price lists yet.')
+      : 'No price lists yet.') +
+      (c.saved_rows ? ` · ${c.saved_rows.toLocaleString()} rows saved for products not in the catalog yet` : '')
     : '';
   if (sheets.length) applyLayout();
   schedulePreview();
@@ -287,7 +288,8 @@ function renderPreview(r) {
       <button class="btn" type="button" id="usePrefix">Ignore ${esc(r.suggestion.prefix)}</button></p></div>`);
   }
   parts.push(`<div class="stats">
-    ${stat(r.matched, `of ${r.rows} rows match catalog parts`, r.matched ? 'good' : 'bad')}
+    ${stat(r.matched, `of ${r.rows.toLocaleString()} rows match catalog parts and are used now`, r.matched ? 'good' : 'bad')}
+    ${r.unmatched ? stat(r.unmatched.toLocaleString(), 'rows saved for products not in the catalog yet') : ''}
     ${cols.price !== null ? stat(r.with_price, 'prices to import', r.with_price ? 'good' : 'bad') : ''}
     ${cols.sku !== null ? stat(r.with_sku, 'customer part numbers to import') : ''}
     ${cols.price !== null ? stat(r.catalog_without_price, `catalog parts still without a price (of ${catalogTotal})`, r.catalog_without_price ? 'bad' : 'good') : ''}
@@ -317,8 +319,8 @@ function renderPreview(r) {
       ${more(r.duplicate_rows.length, r.duplicates)}</details>`);
   }
   if (r.unmatched) {
-    parts.push(`<details><summary>Rows that aren't catalog parts (${r.unmatched}): skipped</summary>
-      <p class="hint" style="margin:6px 0 0">Usually other products on the sheet. Nothing is guessed.</p>
+    parts.push(`<details><summary>Rows saved for later (${r.unmatched.toLocaleString()}): not in the catalog yet</summary>
+      <p class="hint" style="margin:6px 0 0">These are usually other products on the sheet. They are kept with this price list, and when their product line is added to the planner, their part numbers and prices are picked up automatically. Nothing is guessed.</p>
       ${table(['Row', 'In the sheet', 'Why'], r.unmatched_rows.map(x => `<tr><td class="num">${x.n}</td><td class="code">${esc(x.part)}</td><td>${esc(x.reason)}</td></tr>`))}
       ${more(r.unmatched_rows.length, r.unmatched)}</details>`);
   }
@@ -330,7 +332,7 @@ const sheetPart = n => String(sheets[sheetIdx].rows[n - 1]?.[cols.part] ?? '');
 function updateImportButton() {
   const c = currentCustomer(), r = lastPreview;
   const problems = [];
-  if (!r || !r.matched) problems.push('no rows match the catalog yet');
+  if (!r || !(r.matched || r.unmatched)) problems.push('the sheet has no part numbers in the chosen column');
   if (!c && !$('#newName').value.trim()) problems.push('give the new customer a name');
   if (!c && customers.some(x => x.name.toLowerCase() === $('#newName').value.trim().toLowerCase())) problems.push('a customer with that name exists: pick it above');
   if (cols.price !== null && !$('#listName').value.trim()) problems.push('name the price list');
@@ -350,7 +352,7 @@ async function runImport() {
     const code = sent.customer.code;
     const name = sent.customer.name || currentCustomer()?.name || code;
     const link = r.saved.key ? `${location.origin}${location.pathname.replace(/admin\.html$/, '')}?customer=${r.saved.key}` : null;
-    $('#result').innerHTML = `<div class="banner ok"><p><strong>Imported.</strong> ${r.saved.prices} prices and ${r.saved.skus} customer part numbers saved for ${esc(name)}.
+    $('#result').innerHTML = `<div class="banner ok"><p><strong>Imported.</strong> ${r.saved.prices} prices and ${r.saved.skus} customer part numbers saved for ${esc(name)}${r.saved.saved ? `, and ${r.saved.saved.toLocaleString()} rows kept for products not in the catalog yet` : ''}.
       The column choices are remembered for this customer's next sheet.</p>
       ${link ? `<p style="margin-top:8px"><b>${esc(name)}'s private planner link.</b> It is shown only this once: copy it now and send it to them privately.</p>
         <div class="link"><code id="newLink">${esc(link)}</code><button class="btn" type="button" id="copyLink">Copy</button></div>` : ''}</div>`;

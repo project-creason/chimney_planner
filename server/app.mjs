@@ -128,9 +128,11 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
         no_price_rows: cap(r.noPrice), catalog_without_price_parts: cap(r.catalogWithoutPrice),
       };
       if (!body.commit) return report;
-      if (!r.matched.length) throw fail(400, 'No rows match the catalog, so there is nothing to import.');
+      if (!r.matched.length && !r.unmatched.length) throw fail(400, 'The sheet has no part numbers to import.');
+      // rows for parts the catalog doesn't have yet are kept, for when their product line is added
+      const unmatched = new Set(r.unmatched.map(u => u.n));
       const saved = await writePriceImport(db, { customer: body.customer || {}, priceList: body.price_list,
-        matched: r.matched, layout: body.layout });
+        matched: r.matched, saved: rows.filter(x => unmatched.has(x.n)), layout: body.layout });
       return { ...report, saved };
     },
 

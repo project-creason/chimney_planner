@@ -8,7 +8,7 @@ import { connect, migrate, ROOT } from '../db/connect.mjs';
 import { writeCatalog } from '../db/catalog-store.mjs';
 import { buildCatalog } from '../db/import.mjs';
 import { importCustomer } from '../db/customer-import.mjs';
-import { customerPricing, readCustomer } from '../db/customer-store.mjs';
+import { customerPricing, listCustomers, promoteSavedRows, readCustomer, writePriceImport } from '../db/customer-store.mjs';
 import { matchSheet, parsePrice } from '../price-import.mjs';
 import { createApp } from '../app.mjs';
 import { readXlsx } from '../../web/js/xlsx-lite.js';
@@ -131,7 +131,7 @@ test('admin API: password, preview, import that adds SKUs without wiping others,
   assert.equal((await customerPricing(db, 'DEMO', '2027-06-01')).priceList.name, '2026 sample prices', 'a preview writes nothing');
 
   const done = await (await call(app, 'price-import', { body: { ...body, commit: true } })).json();
-  assert.deepEqual(done.saved, { key: null, skus: 1, prices: 1 });
+  assert.deepEqual(done.saved, { key: null, skus: 1, prices: 1, saved: 1 });
   const p2027 = await customerPricing(db, 'DEMO', '2027-06-01');
   assert.equal(p2027.priceList.name, '2027 MSRP');
   assert.deepEqual([...p2027.prices], [['DT|6DT-48SS', 249.99]]);
@@ -146,5 +146,36 @@ test('admin API: password, preview, import that adds SKUs without wiping others,
   assert.ok(made.saved.key, 'a new customer gets its private link key');
   assert.equal((await call(app, 'price-import', { body: { ...body, commit: true, customer: { code: 'x' } } })).status, 400);
   assert.equal((await call(app, 'price-import', { body: { ...body, commit: true, customer: { code: 'NOPE' } } })).status, 400, 'a new customer needs a name');
-  assert.equal((await call(app, 'price-import', { body: { ...body, commit: true, rows: [{ n: 2, part: 'XX' }] } })).status, 400);
+  assert.equal((await call(app, 'price-import', { body: { ...body, commit: true, rows: [{ n: 2, part: '' }] } })).status, 400);
+});
+
+test('rows for parts not in the catalog are kept, and picked up when their line is added', async () => {
+  const db = connect('file::memory:');
+  await migrate(db);
+  await writeCatalog(db, build);
+  const sheet = [{ n: 2, part: 'DuraVent:6DT-48', sku: 'A1', price: '100' }, { n: 3, part: 'DuraVent:6DBK-12', sku: 'B1', price: '$20.499' },
+    { n: 4, part: 'DuraVent:6DBK-24', sku: 'B2', price: 'call' }];
+  const priceList = { name: '2026 MSRP', currency: 'USD', effective_from: '2026-01-01' };
+  const r = matchSheet(sheet, CATALOG);
+  const kept = sheet.filter(x => r.unmatched.some(u => u.n === x.n));
+  const saved = await writePriceImport(db, { customer: { code: 'ACME', name: 'Acme' }, priceList, matched: r.matched, saved: kept });
+  assert.equal(saved.saved, 2);
+  assert.equal((await listCustomers(db))[0].saved_rows, 2);
+  assert.equal(await promoteSavedRows(db), 0, 'nothing new in the catalog yet');
+
+  // a catalog with a DuraBlack line: the kept rows now match and join the same price list
+  const withBlack = structuredClone(build);
+  withBlack.lines.DT.parts.push(...['6DBK-12', '6DBK-24'].map(o => ({ ...build.lines.DT.parts.find(p => p.order_number === '6DT-12'), order_number: o, stock_number: null })));
+  await writeCatalog(db, withBlack);
+  assert.equal(await promoteSavedRows(db), 2);
+  const p = await customerPricing(db, 'ACME', '2026-06-01');
+  assert.equal(p.prices.get('DT|6DBK-12'), 20.5);
+  assert.equal(p.prices.has('DT|6DBK-24'), false, 'an unreadable price stays unpriced');
+  assert.equal(p.skus.get('DT|6DBK-24').sku, 'B2');
+  assert.equal(p.prices.get('DT|6DT-48'), 100);
+  assert.equal((await listCustomers(db))[0].saved_rows, 0);
+
+  // importing the same list again replaces its kept rows rather than adding to them
+  await writePriceImport(db, { customer: { code: 'ACME' }, priceList, matched: [], saved: [{ n: 9, part: 'XYZ-1', price: '5' }] });
+  assert.equal((await listCustomers(db))[0].saved_rows, 1);
 });

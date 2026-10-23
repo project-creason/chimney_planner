@@ -13,11 +13,13 @@
  *   customerPricing(db, code, today)       part numbers and the price list in effect today, keyed `line|order_number`
  *   listCustomers(db)                      customers with their price lists and saved import layout, for the admin page
  *   writePriceImport(db, ...)              saves a matched price sheet from the admin page (see server/price-import.mjs)
+ *   promoteSavedRows(db)                   after a catalog import: saved sheet rows that now match become SKUs and prices
  *
  * Customer rows refer to parts by line + order number, never by row id, so a catalog import leaves them alone.
  * A customer's private link carries a random key; only its SHA-256 is stored (settings.access_key_sha256).
  */
 import { createHash, randomBytes } from 'node:crypto';
+import { matchSheet, parsePrice } from '../price-import.mjs';
 
 export const VERTICALS = ['RETAIL', 'DISTRIBUTOR', 'SERVICE', 'MANUFACTURER', 'INSPECTOR'];
 const CODE = /^[A-Z0-9][A-Z0-9_-]{1,19}$/;
@@ -167,13 +169,15 @@ export async function writeCustomer(db, { customer: c, parts, prices }, { newKey
  * `layout` (the columns picked on the page) is remembered for the customer's next sheet.
  * customer = { code, name, vertical }: a new code creates the customer and returns its private link key.
  */
-export async function writePriceImport(db, { customer: c, priceList, matched, layout }) {
+export async function writePriceImport(db, { customer: c, priceList, matched, saved = [], layout }) {
   if (!CODE.test(c.code || '')) throw Object.assign(new Error('Customer code must be 2-20 letters, digits, - or _ (e.g. ACME).'), { status: 400 });
   const { old, settings, key } = await settingsWithKey(db, c.code, false);
   if (!old && !c.name) throw Object.assign(new Error('A new customer needs a name.'), { status: 400 });
   if (c.vertical && !VERTICALS.includes(c.vertical)) throw Object.assign(new Error(`Vertical must be one of ${VERTICALS.join(', ')}.`), { status: 400 });
   const prices = matched.filter(m => m.price != null);
-  if (prices.length) {
+  const listName = priceList?.name?.trim() || '';
+  const keepsList = prices.length > 0 || (listName && saved.some(r => parsePrice(r.price) != null));
+  if (keepsList) {
     if (!priceList?.name) throw Object.assign(new Error('Name the price list.'), { status: 400 });
     if (!/^[A-Z]{3}$/.test(priceList.currency || '')) throw Object.assign(new Error('Currency must be a 3-letter code such as USD.'), { status: 400 });
     for (const k of ['effective_from', 'effective_to']) {
@@ -191,20 +195,62 @@ export async function writePriceImport(db, { customer: c, priceList, matched, la
               description = coalesce(excluded.description, customer_parts.description)`,
       args: [c.code, m.line, m.order_number, m.sku, m.description] })),
   ];
-  if (prices.length) s.push(...replacePriceList(c.code, priceList, prices));
+  if (keepsList) s.push(...replacePriceList(c.code, { ...priceList, name: listName }, prices));
+  // rows for parts not in the catalog yet replace those kept from this list's last import
+  const savedUnder = keepsList ? listName : '';
+  s.push({ sql: 'DELETE FROM saved_sheet_rows WHERE customer = ? AND price_list = ?', args: [c.code, savedUnder] },
+    ...saved.map(r => ({
+      sql: 'INSERT OR REPLACE INTO saved_sheet_rows (customer, price_list, row_n, part, sku, price, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      args: [c.code, savedUnder, r.n, String(r.part), String(r.sku ?? '').trim() || null, keepsList ? parsePrice(r.price) : null,
+        String(r.description ?? '').trim() || null] })));
   await db.batch(s, 'write');
-  return { key, skus: matched.filter(m => m.sku).length, prices: prices.length };
+  return { key, skus: matched.filter(m => m.sku).length, prices: prices.length, saved: saved.length };
+}
+
+/**
+ * Saved sheet rows that match the catalog now (a product line was added since they were imported) become the
+ * customer's SKUs and prices, then leave the saved rows. A price already set for a part is not overwritten.
+ * Returns the number of rows promoted.
+ */
+export async function promoteSavedRows(db, catalog) {
+  const rows = await all(db, 'SELECT * FROM saved_sheet_rows ORDER BY customer, price_list, row_n');
+  if (!rows.length) return 0;
+  catalog ??= await catalogPartsWithStock(db);
+  const groups = new Map();
+  for (const r of rows) {
+    const k = `${r.customer}\u0000${r.price_list}`;
+    groups.set(k, [...(groups.get(k) || []), r]);
+  }
+  const s = [];
+  let promoted = 0;
+  for (const group of groups.values()) {
+    const { customer, price_list: list } = group[0];
+    const { matched } = matchSheet(group.map(r => ({ n: Number(r.row_n), part: r.part, sku: r.sku, price: r.price ?? undefined,
+      description: r.description })), catalog);
+    for (const m of matched) {
+      promoted++;
+      if (m.sku) s.push({ sql: `INSERT INTO customer_parts (customer, line, order_number, sku, description) VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT (customer, line, order_number) DO NOTHING`, args: [customer, m.line, m.order_number, m.sku, m.description] });
+      if (m.price != null && list) s.push({ sql: `INSERT OR IGNORE INTO prices (price_list_id, line, order_number, price)
+        SELECT id, ?, ?, ? FROM price_lists WHERE customer = ? AND name = ?`, args: [m.line, m.order_number, m.price, customer, list] });
+      s.push({ sql: 'DELETE FROM saved_sheet_rows WHERE customer = ? AND price_list = ? AND row_n = ?', args: [customer, list, m.n] });
+    }
+  }
+  if (s.length) await db.batch(s, 'write');
+  return promoted;
 }
 
 export async function listCustomers(db) {
-  const [customers, lists] = await Promise.all([
+  const [customers, lists, saved] = await Promise.all([
     all(db, 'SELECT code, name, vertical, settings FROM customers ORDER BY name'),
     all(db, `SELECT l.customer, l.name, l.currency, l.effective_from, l.effective_to, count(p.order_number) AS prices
              FROM price_lists l LEFT JOIN prices p ON p.price_list_id = l.id GROUP BY l.id ORDER BY l.effective_from DESC`),
+    all(db, 'SELECT customer, count(*) AS n FROM saved_sheet_rows GROUP BY customer'),
   ]);
   return customers.map(c => ({
     code: c.code, name: c.name, vertical: c.vertical,
     import_layout: JSON.parse(c.settings || '{}').import_layout ?? null,
+    saved_rows: Number(saved.find(x => x.customer === c.code)?.n ?? 0),
     price_lists: lists.filter(l => l.customer === c.code).map(l => ({ name: l.name, currency: l.currency,
       effective_from: l.effective_from, effective_to: l.effective_to, prices: Number(l.prices) })),
   }));
