@@ -18,8 +18,11 @@ export function makeCatalog(index, lineData) {
   const byCategory = new Map();
   for (const p of lineData.parts) {
     if (p.active === false) continue;
-    if (!byCategory.has(p.category)) byCategory.set(p.category, []);
-    byCategory.get(p.category).push(p);
+    // a part can also do another category's job (one wall support both carries the tee and braces the run)
+    for (const c of [p.category, ...(p.attributes?.also_categories || [])]) {
+      if (!byCategory.has(c)) byCategory.set(c, []);
+      byCategory.get(c).push(p);
+    }
   }
   return {
     line,
@@ -35,6 +38,18 @@ export function makeCatalog(index, lineData) {
       if (!r) throw new Error(`Catalog is missing rule '${key}'`);
       return r;
     },
+    /** A requirement applies unless the line's rule sets it to 0 (not required for this line). */
+    requires(key) {
+      return this.rule(key).value !== 0;
+    },
+    /** Rows of a lookup table (elbow offsets, support projection...) that apply to a size; rows without a size apply to all. */
+    lookup(name, size) {
+      return (lineData.lookups?.[name] || []).filter(r => r.size == null || String(r.size) === String(size));
+    },
+    /** Categories the line has active parts in. */
+    categoryCodes() {
+      return [...byCategory.keys()];
+    },
     /** Active parts in a category, optionally only those that fit a size. */
     parts(category, size) {
       const list = byCategory.get(category) || [];
@@ -49,6 +64,8 @@ export function makeCatalog(index, lineData) {
  */
 export function strictest(rows, def, scopeRank) {
   const sign = def?.direction === 'MIN' ? 1 : def?.direction === 'MAX' ? -1 : 0;
+  // a limit left blank means "this source states no figure": any source that states one wins
+  if (def?.kind === 'LIMIT' && rows.some(r => r.value != null)) rows = rows.filter(r => r.value != null);
   const score = r => [sign * (r.value ?? 0), sign * (r.value_max ?? r.value ?? 0), scopeRank(r)];
   return rows.reduce((best, r) => {
     const a = score(r), b = score(best);
@@ -57,7 +74,7 @@ export function strictest(rows, def, scopeRank) {
   });
 }
 
-export const attr = (part, key) => part.attributes?.[key];
+export const attr = (part, key) => part?.attributes?.[key];
 
 export async function loadCatalog(base = 'catalog', lineCode = 'DT') {
   const index = await (await fetch(`${base}/index.json`)).json();
@@ -65,4 +82,28 @@ export async function loadCatalog(base = 'catalog', lineCode = 'DT') {
   if (!file) throw new Error(`Product line '${lineCode}' is not in the catalog build`);
   const line = await (await fetch(`${base}/${file}`)).json();
   return makeCatalog(index, line);
+}
+
+/**
+ * What a product line offers, for the form: which part categories it has, its pipe finishes, cap styles,
+ * the connector lines its support box table names, and the few rule values the form's hints quote.
+ * Worked out from the catalog, so the page never hard-codes one manufacturer's choices.
+ */
+export function lineOptions(cat, index = {}) {
+  const source = (index.sources || []).find(s => s.source_code === cat.line.default_source);
+  const chaseCovers = cat.parts('CHASE_TOP_FLASHING').map(p => p.dimensions?.B?.value_in).filter(v => v != null);
+  return {
+    categories: cat.categoryCodes(),
+    // finishes a whole chimney can be built in (painted interior-only sections aside), stainless first
+    finishes: [...new Set(cat.parts('CHIMNEY_PIPE').filter(p => !attr(p, 'interior_only')).map(p => p.finish).filter(Boolean))]
+      .sort((a, b) => (b === 'SS') - (a === 'SS')),
+    capStyles: [...new Set(cat.parts('CAP').map(p => attr(p, 'cap_style') || 'STANDARD'))],
+    connectors: [...new Set((cat.lookups.support_box_pitch || []).map(r => r.connector_line).filter(c => c !== 'ANY'))],
+    maxOffsets: cat.rule('offset.max_count').value,
+    draftGuideline: cat.rule('draft.min_vertical_ft').value != null,
+    jointOverlapIn: cat.line.joint_overlap_in,
+    chaseAboveMinIn: cat.rule('chase.min_cap_clearance_in').value,
+    chaseFlashingCoversIn: chaseCovers.length ? [Math.min(...chaseCovers), Math.max(...chaseCovers)] : null,
+    source: source ? { document_code: source.document_code, published: source.published, title: source.title } : null,
+  };
 }

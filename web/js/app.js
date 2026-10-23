@@ -142,9 +142,11 @@ const ROW = {
     </div>`,
 };
 // ------------------------------------------------------------------ offsets: only shifts the elbow chart can make
-const chart = () => planner?.elbowOffsets || [];
-const allowedAngles = () => (state.appliance.only15 ? [15] : [15, 30]);
-const rowAngles = r => (['15', '30'].includes(String(r.angle)) ? [Number(r.angle)] : allowedAngles())
+/** The line's elbow chart for the chosen collar size (charts can differ by size). */
+const chart = () => planner?.elbowOffsets(state.appliance.collar || '6') || [];
+const lineAngles = () => [...new Set(chart().map(r => r.angle_deg))].sort((a, b) => a - b);
+const allowedAngles = () => (state.appliance.only15 ? [15] : lineAngles().length ? lineAngles() : [15, 30]);
+const rowAngles = r => (lineAngles().map(String).includes(String(r.angle)) ? [Number(r.angle)] : allowedAngles())
   .filter(a => allowedAngles().includes(a));
 /** Fractions builders read: 24.125 -> 24⅛" */
 function inFrac(v) {
@@ -242,7 +244,7 @@ function applyVisibility() {
   rc.innerHTML = roofIn == null
     ? ({ EAVE: 'Enter A and B to work out the roof height.', ATTIC: 'Enter the attic height (C) in section 3 to work out the roof height.' }[state.roof.method] ?? '')
     : `Roof height at the chimney: <b>${fmtFtIn(roofIn)}</b> above the stove's floor.`;
-  $('#exampleNote').hidden = JSON.stringify(state) !== JSON.stringify(EXAMPLE_STATE);
+  $('#exampleNote').hidden = JSON.stringify(state) !== JSON.stringify(keepLine(clone(EXAMPLE_STATE)));
 }
 
 /** Attic section: says where the measurement starts and what it adds up to. */
@@ -272,7 +274,8 @@ function onEdit(e) {
   const el = e.target;
   if (el.name) {
     setPath(state, el.name, readControl(el));
-    if (el.name === 'appliance.only15') {
+    if (el.name === 'chimney.line') { switchLine(el.value); return; }
+    if (el.name === 'appliance.only15' || el.name === 'appliance.collar') {
       snapOffsets();
       for (const box of form.querySelectorAll('[data-kind="offset"]')) renderList(box);
     }
@@ -311,7 +314,9 @@ form.addEventListener('click', e => {
   if (add) box.querySelector('.row:last-child input')?.focus();
 });
 form.addEventListener('submit', e => e.preventDefault());
-$('#reset').addEventListener('click', () => { state = clone(EXAMPLE_STATE); writeControls(); syncManualBox(true); update(); });
+/** A fresh form keeps the product line the user is working in. */
+const keepLine = s => { s.chimney.line = state.chimney.line; fitToLine(s); return s; };
+$('#reset').addEventListener('click', () => { state = keepLine(clone(EXAMPLE_STATE)); writeControls(); syncManualBox(true); update(); });
 // Light by default; the choice is remembered on this device
 const THEME_KEY = 'chimney-planner/theme';
 function showTheme() {
@@ -340,7 +345,7 @@ $('#clearForm').addEventListener('click', e => {
   }
   clearTimeout(clearArmed); clearArmed = null;
   btn.textContent = 'Clear the form'; btn.classList.remove('armed');
-  state = blankState();
+  state = keepLine(blankState());
   writeControls();
   syncManualBox(true);
   update();
@@ -353,7 +358,8 @@ const MANUAL_KEYS = ['minHeightFt', 'maxHeightFt', 'maxOffsets', 'minRiseIn', 'm
 function syncManualBox(setOpen = false) {
   const a = state.appliance;
   const filled = MANUAL_KEYS.filter(k => a[k] !== null && a[k] !== '' && a[k] !== false).length;
-  $('#manualCount').textContent = filled ? `${filled} answer${filled > 1 ? 's' : ''} entered` : 'Not entered: Duravent\'s guideline is used';
+  $('#manualCount').textContent = filled ? `${filled} answer${filled > 1 ? 's' : ''} entered`
+    : planner?.options?.draftGuideline === false ? 'Not entered: only the roof rules set the height' : `Not entered: ${makerName()}'s guideline is used`;
   if (setOpen) $('#manualBox').open = filled > 0;
 }
 
@@ -406,8 +412,8 @@ function figures(r, spec) {
   const from = rt === 'WALL' ? 'the tee outside the wall' : rt === 'FIREPLACE' ? 'the top of the fireplace' : 'the ceiling support box';
   const out = [];
   out.push({ label: 'Chimney Pipe Length', value: fmtFtIn(g.chimneyLengthIn),
-    note: `The total length of DuraTech chimney pipe when stacked, from ${from} to the top of the chimney` +
-      `${g.offsets?.length ? ', including the offset elbows' : ''}. Each section's 1¼" joint overlap is already taken off.` });
+    note: `The total length of ${planner.line.name} chimney pipe when stacked, from ${from} to the top of the chimney` +
+      `${g.offsets?.length ? ', including the offset elbows' : ''}. Each section's ${fmtIn(planner.options?.jointOverlapIn ?? 1.25)} joint overlap is already taken off.` });
   const manual = spec.appliance.minSystemHeightFt != null ? ` Your manual's minimum: ${spec.appliance.minSystemHeightFt} ft.` : '';
   out.push({ label: 'Flue Collar to Top', value: fmtFtIn(g.systemHeightIn),
     note: `From the top of the ${isFp ? 'fireplace' : 'stove'}'s flue collar to the top of the chimney: the height appliance manuals give their minimum in.${manual}` +
@@ -610,7 +616,7 @@ function render(r, spec) {
     status.innerHTML = `<div class="banner warn"><p class="bhead">${ICON.CAUTION}<strong>Your appliance manual's height isn't applied yet.</strong> ${esc(manualWarn.replace(/^The .*? manual's minimum chimney height was not entered, so its own requirements are not applied\. /, ''))} <button type="button" class="goto" data-open-manual>Enter it</button></p></div>`;
     status.querySelector('[data-open-manual]')?.addEventListener('click', () => showField([$('#appliance-minHeightFt')]));
   } else {
-    status.innerHTML = `<div class="banner ok"><p><strong>Plan complete.</strong> Uses the stricter of Duravent's rules, the 3-2-10 roof rule and your manual's limits.</p></div>`;
+    status.innerHTML = `<div class="banner ok"><p><strong>Plan complete.</strong> Uses the stricter of ${esc(makerName())}'s rules, the 3-2-10 roof rule and your manual's limits.</p></div>`;
   }
 
   // layout prompt next to the manual height field
@@ -798,14 +804,74 @@ fillPitchOptions();
 writeControls();
 syncManualBox(true);
 applyVisibility();
-connectPlanner('DT', customerKey)
-  .then(p => {
-    planner = p;
-    document.documentElement.dataset.planner = p.mode;
-    snapOffsets();
-    for (const box of form.querySelectorAll('[data-kind="offset"]')) renderList(box);
-    update();
-  })
+// ------------------------------------------------------------------ product line
+const CAP_NAMES = { STANDARD: 'Standard cap', DIKAPT: 'DIKAPT anti-downdraft cap', DELUXE: 'Deluxe rain cap', REVOLVING: 'Revolving rain cap' };
+const FINISH_NAMES = { SS: 'Stainless steel', GA: 'Galvalume (6"–8")', BLACK: 'Black' };
+const CONNECTOR_NAMES = { DB: 'DuraBlack single-wall', DVL: 'DVL double-wall' };
+const lineHas = category => !planner || (planner.options?.categories || []).includes(category);
+
+/** Choices the line doesn't offer are hidden; an answer that isn't offered moves to the first one that is. */
+function fitToLine(s) {
+  if (!planner) return s;
+  for (const el of form.querySelectorAll('select[name]')) {
+    const ok = [...el.options].filter(o => !o.disabled && !o.hidden).map(o => o.value);
+    const v = String(getPath(s, el.name) ?? '');
+    if (ok.length && v !== '' && !ok.includes(v)) setPath(s, el.name, ok[0]);
+  }
+  return s;
+}
+function applyLineOptions() {
+  const o = planner.options || {};
+  const maker = makerName(), name = planner.line.name;
+  document.title = `${name} Chimney Planner`;
+  $('#lineMaker').textContent = maker;
+  $('#lineName').textContent = name;
+  $('#lineSource').textContent = o.source ? ` · parts from catalog ${o.source.document_code}${o.source.published ? ` (${o.source.published})` : ''}` : '';
+  for (const el of document.querySelectorAll('[data-fill]')) {
+    const f = el.dataset.fill;
+    el.textContent = f === 'maker' ? maker : f === 'line' ? name : f === 'maxOffsets' ? String(o.maxOffsets ?? 2)
+      : f === 'chaseMinIn' ? fmtIn(o.chaseAboveMinIn ?? 6) : el.textContent;
+  }
+  $('#chaseSetOption').textContent = `A height I set (${fmtIn(o.chaseAboveMinIn ?? 6)} minimum)`;
+  $('#chaseFlashingHint').textContent = o.chaseFlashingCoversIn
+    ? `${maker}'s chase top flashing is a square of about ${fmtIn(o.chaseFlashingCoversIn[0])} to ${fmtIn(o.chaseFlashingCoversIn[1])}, depending on chimney size. A bigger chase needs a cover made by a sheet-metal shop; the parts list will say so.`
+    : `${name} has no chase top flashing, so the parts list includes a chase cover made by a sheet-metal shop.`;
+  const sel = $('#chimney-line');
+  sel.innerHTML = planner.lines.map(l => `<option value="${esc(l.code)}">${esc(l.manufacturer ? `${l.manufacturer} ${l.name}` : l.name)}</option>`).join('');
+  $('#linePick').hidden = planner.lines.length < 2;
+  const fill = (id, codes, names) => {
+    $(id).innerHTML = codes.map(c => `<option value="${esc(c)}">${esc(names[c] || c)}</option>`).join('');
+  };
+  fill('#chimney-finish', o.finishes?.length ? o.finishes : ['SS'], FINISH_NAMES);
+  fill('#chimney-cap', o.capStyles?.length ? o.capStyles : ['STANDARD'], CAP_NAMES);
+  fill('#chimney-connector', o.connectors?.length ? o.connectors : ['DB'], CONNECTOR_NAMES);
+  $('#connectorField').hidden = !o.connectors?.length;
+  for (const el of form.querySelectorAll('[data-needs]')) {
+    const off = !el.dataset.needs.split('|').some(lineHas);
+    if (el.tagName === 'OPTION') { el.hidden = off; el.disabled = off; } else el.toggleAttribute('data-line-off', off);
+  }
+  fitToLine(state);
+  state.chimney.line = planner.line.code;
+  writeControls();
+}
+
+/** Switch product line: same answers, that line's parts and rules. */
+async function switchLine(code) {
+  $('#results').setAttribute('aria-busy', 'true');
+  try { await connect(code); }
+  catch (err) { $('#status').innerHTML = `<div class="banner crit"><p><strong>That product line didn't load.</strong> ${esc(err.message)}.</p></div>`; }
+}
+async function connect(code) {
+  const p = await connectPlanner(code, customerKey);
+  planner = p;
+  document.documentElement.dataset.planner = p.mode;
+  applyLineOptions();
+  snapOffsets();
+  for (const box of form.querySelectorAll('[data-kind="offset"]')) renderList(box);
+  syncManualBox();
+  update();
+}
+connect(state.chimney.line)
   .catch(err => {
     $('#status').innerHTML = `<div class="banner crit"><p><strong>The parts catalog didn't load.</strong> ${esc(err.message)}. Reload the page to try again.</p></div>`;
   });

@@ -117,7 +117,7 @@ test('admin API: password, preview, import that adds SKUs without wiping others,
 
   const listed = await (await call(app, 'customers')).json();
   assert.equal(listed.customers[0].code, 'DEMO');
-  assert.equal(listed.catalog.length, CATALOG.length);
+  assert.equal(listed.catalog.length, Object.values(build.lines).reduce((n, l) => n + l.parts.length, 0));   // every line's parts
 
   const body = {
     customer: { code: 'DEMO' }, price_list: { name: '2027 MSRP', currency: 'USD', effective_from: '2027-01-01' },

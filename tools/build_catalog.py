@@ -37,6 +37,8 @@ AUTHORITIES = {"MANUFACTURER", "NFPA211", "IRC", "LOCAL", "INDUSTRY"}   # INDUST
 RULE_KINDS = {"LIMIT", "REQUIREMENT", "ADVICE"}
 RULE_DIRECTIONS = {"MIN", "MAX", "EXACT"}      # MIN: a higher value is stricter; MAX: a lower one is
 PIPE_CATEGORIES = {"CHIMNEY_PIPE"}          # get effective_length_in computed
+# limits the planner can work without: blank = "this manufacturer states no figure" (see planner.js)
+BLANK_LIMITS_OK = {"draft.min_vertical_ft", "draft.elbow_or_altitude_factor", "roof.bracket_interval_ft"}
 RANGE_PAIRS = [("adjustable_min_in", "adjustable_max_in"), ("pitch_min", "pitch_max"),
                ("wall_min_in", "wall_max_in"), ("standoff_min_in", "standoff_max_in")]
 
@@ -214,7 +216,10 @@ def build_shared():
             P.err(w, f"scope must be GLOBAL, a product line code or a manufacturer code, got '{r['scope']}'")
         rd = rule_defs.get(r["rule_key"])
         if rd and rd["kind"] == "LIMIT" and r["value"] == "":
-            P.err(w, f"'{r['rule_key']}' is a limit and needs a value")
+            if r["rule_key"] in BLANK_LIMITS_OK:
+                P.warn(w, f"'{r['rule_key']}' left blank: {r['scope']} states no figure")
+            else:
+                P.err(w, f"'{r['rule_key']}' is a limit and needs a value")
         if not r["statement"]:
             P.err(w, "statement is required")
         v, vmax = num(w, r, "value"), num(w, r, "value_max")
@@ -395,26 +400,36 @@ def build_line(code, line, shared):
             val = v
         p["attributes"][k] = val
 
+    def size_of(w, r):
+        """Optional 'size' column of a lookup table: blank = the row applies to every size."""
+        s = r.get("size", "")
+        if s and s not in sizes:
+            P.err(w, f"size '{s}' not in {code}/sizes.csv")
+        return s or None
+
     lookups = {}
     elbows = []
     for w, r in read(d / "elbow_offsets.csv", ["angle_deg", "between_desc", "between_nominal_in", "offset_in", "rise_in"],
-                     ) if (d / "elbow_offsets.csv").exists() else []:
-        elbows.append({"angle_deg": num(w, r, "angle_deg", required=True), "between_desc": r["between_desc"],
-                       "between_nominal_in": num(w, r, "between_nominal_in", required=True),
-                       "offset_in": num(w, r, "offset_in", required=True), "rise_in": num(w, r, "rise_in", required=True)})
+                     ["size"]) if (d / "elbow_offsets.csv").exists() else []:
+        row = {"angle_deg": num(w, r, "angle_deg", required=True), "between_desc": r["between_desc"],
+               "between_nominal_in": num(w, r, "between_nominal_in", required=True),
+               "offset_in": num(w, r, "offset_in", required=True), "rise_in": num(w, r, "rise_in", required=True)}
+        if "size" in r:
+            row = {"size": size_of(w, r), **row}
+        elbows.append(row)
     if elbows:
-        for ang in {e["angle_deg"] for e in elbows}:
-            seq = sorted((e for e in elbows if e["angle_deg"] == ang), key=lambda e: e["between_nominal_in"] or 0)
+        for ang, sz in {(e["angle_deg"], e.get("size")) for e in elbows}:
+            seq = sorted((e for e in elbows if e["angle_deg"] == ang and e.get("size") == sz), key=lambda e: e["between_nominal_in"] or 0)
             for a, b in zip(seq, seq[1:]):
                 if b["offset_in"] <= a["offset_in"] or b["rise_in"] <= a["rise_in"]:
-                    P.err(f"{code}/elbow_offsets.csv", f"{ang}° offset/rise not increasing at {b['between_desc']}")
+                    P.err(f"{code}/elbow_offsets.csv", f"{ang}° offset/rise not increasing at {b['between_desc']}" + (f' ({sz}")' if sz else ""))
         lookups["elbow_offsets"] = elbows
 
     sbp = []
     if (d / "support_box_pitch.csv").exists():
         for w, r in read(d / "support_box_pitch.csv", ["connector_line", "pitch_min", "pitch_max", "box_height_in"]):
-            if r["connector_line"] not in shared["product_lines"]:
-                P.err(w, f"unknown product line '{r['connector_line']}'")
+            if r["connector_line"] != "ANY" and r["connector_line"] not in shared["product_lines"]:
+                P.err(w, f"unknown product line '{r['connector_line']}' (or ANY for every connector)")
             row = {"connector_line": r["connector_line"], "pitch_min": num(w, r, "pitch_min", required=True),
                    "pitch_max": num(w, r, "pitch_max", required=True),
                    "box_height_in": num(w, r, "box_height_in", required=True)}
@@ -426,6 +441,18 @@ def build_line(code, line, shared):
             if row["box_height_in"] not in heights:
                 P.err(f"{code}/support_box_pitch.csv", f"no square support box {row['box_height_in']}in tall in parts.csv")
         lookups["support_box_pitch"] = sbp
+
+    proj = []
+    if (d / "support_projection.csv").exists():
+        for w, r in read(d / "support_projection.csv", ["pitch_min", "pitch_max", "below_ceiling_in"], ["size"]):
+            row = {"pitch_min": num(w, r, "pitch_min", required=True), "pitch_max": num(w, r, "pitch_max", required=True),
+                   "below_ceiling_in": num(w, r, "below_ceiling_in", required=True)}
+            if "size" in r:
+                row = {"size": size_of(w, r), **row}
+            if None not in (row["pitch_min"], row["pitch_max"]) and row["pitch_min"] > row["pitch_max"]:
+                P.err(w, "pitch_min > pitch_max")
+            proj.append(row)
+        lookups["support_projection"] = proj
 
     noted = sum(1 for p in parts if p["note"])
     if noted:

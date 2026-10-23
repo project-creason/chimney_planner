@@ -1,7 +1,9 @@
 # Chimney Venting Planner
 
-Enter details about a home and a wood stove or factory-built fireplace, and get a complete Duravent
-DuraTech (5"–8") chimney parts list that follows Duravent's instructions and NFPA 211.
+Enter details about a home and a wood stove or factory-built fireplace, and get a complete chimney parts list
+that follows the chimney maker's instructions and NFPA 211. Two product lines are loaded: Duravent DuraTech and
+ICC EXCEL (both 5"–8"); the page has a picker to switch between them. Adding a line is data only: see
+`catalog/README.md`.
 
 The same page runs two ways. Where it is served with the planner API (on Vercel), every plan is worked out by the
 server from the database (SQLite, hosted on Turso). Where there is no API (GitHub Pages, a plain static server), it
@@ -12,13 +14,13 @@ plans; the results say which one made the plan ("worked out by the planning serv
 
 | Folder | What it holds |
 |---|---|
-| `catalog/` | The editable source: Duravent catalog data and rules as CSV files. See `catalog/README.md`. |
+| `catalog/` | The editable source: each product line's parts and rules as CSV files. See `catalog/README.md`. |
 | `tools/build_catalog.py` | Checks the CSVs and builds `web/catalog/*.json`. Python 3, standard library only. |
 | `web/` | The website itself. This folder is what gets hosted. |
 | `customers/` | Retailers' and distributors' own part numbers and prices. Only the made-up `DEMO` is committed. See `customers/README.md`. |
 | `server/` | The API and database: `schema.sql`, CSV import and export, customer pricing, and the HTTP server. |
 | `api/` | The API as Vercel functions (`/api/lines`, `/api/plan`, `/api/customer`, `/api/health`, `/api/admin/*`), all running `server/app.mjs`. |
-| `tests/` | Automated tests for the planner and the form, plus 282 recorded plans every change must reproduce. |
+| `tests/` | Automated tests for the planner and the form, plus 282 recorded plans per product line that every change must reproduce. |
 | `server/tests/` | Database and API tests (need `npm install`). |
 
 ## Common tasks
@@ -33,8 +35,8 @@ npm run customer:import -- customers/DEMO   # check and load a customer's SKUs a
 npm run customer:export -- DEMO DIR         # write a customer's sheets back out
 npm run server          # API on http://localhost:8787 (POST /api/plan, GET /api/lines)
 npm run dev             # site + API together on http://localhost:3000, as Vercel serves them
-npm run check:api -- URL   # send the 282 recorded scenarios to a running API and compare
-node tools/make_golden.mjs # re-record the 282 plans, only when a plan is meant to change
+npm run check:api -- URL   # send every line's recorded scenarios to a running API and compare
+node tools/make_golden.mjs [LINE]   # re-record a line's 282 plans (default DT), only when they are meant to change
 cd web && python3 -m http.server 8000   # try it at http://localhost:8000
 ```
 

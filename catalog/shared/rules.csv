@@ -34,3 +34,28 @@ chase.min_cap_clearance_in,MANUFACTURER,DT,6,,in,"At a chase top, at least 6"" f
 termination.shroud_spec,MANUFACTURER,DT,,,,A decorative shroud over the termination keeps the UL listing only if built to Duravent shroud specification L157.,"Catalog p.4, p.6",0
 roof.radiation_shield_per_appliance,MANUFACTURER,DT,,,,A roof radiation shield may be required by the appliance manufacturer (notably some Canadian factory-built fireplaces).,Catalog p.13,0
 ceiling.pass_through_shield_above_fireplace,MANUFACTURER,DT,,,,The pass-through radiation shield suits a ceiling directly above a factory-built fireplace; its top serves as the attic shield where required.,Catalog p.18,0
+offset.resupport_above_each,INDUSTRY,GLOBAL,0,,,Re-support the chimney above an offset where the chimney maker's instructions call for it.,Planner default; a line that requires it sets 1,0
+clearance.combustibles_in,MANUFACTURER,XL,2,,in,"Keep at least 2"" clearance between EXCEL and combustibles, except inside factory-built supports certified for less.",XL-CAT p.8; XLUSA-II p.3,0
+flue.diameter_match_appliance,MANUFACTURER,XL,,,,The chimney should be the size recommended by the appliance manufacturer.,XLUSA-II p.1,0
+offset.max_count,MANUFACTURER,XL,2,,count,No more than four elbows (two offsets) in one installation.,XLUSA-II p.12,0
+offset.max_elbow_angle_deg,MANUFACTURER,XL,30,,deg,Offsets use 15° or 30° insulated elbows; 45° elbows are certified for Canada only.,XLUSA-II p.12; XL-CAT p.11,0
+offset.resupport_above_each,MANUFACTURER,XL,1,,,"An offset support (EOS) or roof support must be installed above each offset (two elbows), anywhere on the vertical run above it.","XLUSA-II p.12, p.22",0
+attic.shield_required,MANUFACTURER,XL,,,,"Where the chimney enters an insulated attic, the support or radiation shield needs a storm collar on top so insulation cannot fall into the air space.","XLUSA-II p.4, p.9, p.29",0
+ceiling.pass_through_shield_above_fireplace,MANUFACTURER,XL,,,,EXCEL has no pass-through shield; use a radiation shield (ERS) at each floor and ceiling.,XL-CAT p.18,0
+wall.thimble_interior_projection_in,MANUFACTURER,XL,4,,in,"The horizontal chimney section extends at least 4"" into the room past the finished interior wall.","XLUSA-II p.15, p.17",0
+wall.strap_interval_ft,MANUFACTURER,XL,8,,ft,Install another wall support at 8 ft intervals up the wall.,"XLUSA-II p.16, p.17; XL-CAT p.11",0
+roof.bracket_threshold_ft,MANUFACTURER,XL,5,,ft,"If the chimney extends more than 5 ft above the roof, secure it with a roof brace (ERB).","XLUSA-II p.6, p.9, p.26",0
+roof.bracket_interval_ft,MANUFACTURER,XL,,,ft,The EXCEL instructions call for a roof brace above 5 ft and give no spacing for more than one.,XLUSA-II p.26,0
+roof.storm_collar_with_flashing,MANUFACTURER,XL,,,,Every EXCEL flashing comes with its storm collar; seal it to the chimney with silicone.,XL-CAT p.16-17; XLUSA-II p.32,0
+roof.radiation_shield_per_appliance,MANUFACTURER,XL,,,,A roof radiation shield (ERRS) is required with some roof support and outside chase installations.,XL-CAT p.18,0
+term.min_above_penetration_ft,MANUFACTURER,XL,3,,ft,The chimney extends at least 3 ft above where it passes through the roof.,"XLUSA-II p.6, p.7",0
+term.min_above_within_horizontal_ft,MANUFACTURER,XL,2,,ft,"The chimney is at least 2 ft higher than any wall, roof or building within 10 ft.","XLUSA-II p.6, p.7",0
+term.horizontal_check_distance_ft,MANUFACTURER,XL,10,,ft,Horizontal distance used for the 2 ft rule.,XLUSA-II p.6,0
+termination.shroud_spec,MANUFACTURER,XL,,,,The EXCEL instructions do not cover decorative shrouds; ask ICC before fitting one.,Not covered in XLUSA-II,0
+draft.min_vertical_ft,MANUFACTURER,XL,,,ft,The EXCEL instructions give no minimum chimney height for draft; the appliance manual's figure applies.,Not covered in XLUSA-II,0
+draft.elbow_or_altitude_factor,MANUFACTURER,XL,,,multiplier,"The EXCEL instructions give no height allowance for elbows, a tee or altitude; the appliance manual's table applies.",Not covered in XLUSA-II,0
+route.interior_preferred,MANUFACTURER,XL,,,,"If possible install an interior chimney: it performs better than an exterior one, which can draft poorly and build creosote quickly in cold climates.",XLUSA-II p.27-28,0
+general.inspection_recommended,MANUFACTURER,XL,,,,Contact local building or fire officials about restrictions and installation inspection in your area.,XLUSA-II p.1,0
+appliance.must_approve_chimney,MANUFACTURER,XL,,,,"With a factory-built fireplace, the chimney and fireplace are tested as one system: follow the fireplace instructions.",XLUSA-II p.7,0
+chase.storm_collar_required,MANUFACTURER,XL,,,,Seal the chimney where it leaves the chase top with a storm collar.,XL-CAT p.17 (EVCC),0
+chase.min_cap_clearance_in,MANUFACTURER,XL,8,,in,"For chase installations, the chimney extends at least 8"" above the top of the chase.",XLUSA-II p.6,0

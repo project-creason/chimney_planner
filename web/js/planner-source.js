@@ -7,7 +7,7 @@
  * A customer's private link (?customer=<key>) adds their SKUs and prices: the server returns them with each plan
  * as `order`, which the page finds on the plan it gets back. Only the server has customer data.
  */
-import { loadCatalog } from './engine/catalog.js';
+import { makeCatalog, lineOptions } from './engine/catalog.js';
 import { planChimney } from './engine/planner.js';
 
 const API = 'api';
@@ -19,6 +19,13 @@ async function apiError(r) {
   return new Error(msg);
 }
 
+/** Elbow chart rows for one chimney size (rows without a size apply to every size). */
+const forSize = rows => size => rows.filter(r => r.size == null || String(r.size) === String(size));
+
+/**
+ * Connects to the planner for one product line. `lines` lists every line the page can switch to;
+ * when lineCode is not one of them, the first line is used.
+ */
 export async function connectPlanner(lineCode = 'DT', customerKey = null) {
   let r = null;
   try { r = await fetch(`${API}/lines`, { headers: { Accept: 'application/json' } }); } catch { /* no server here */ }
@@ -29,8 +36,9 @@ export async function connectPlanner(lineCode = 'DT', customerKey = null) {
     return p;
   }
   if (!r.ok) throw await apiError(r);
-  const line = (await r.json()).find(l => l.code === lineCode);
-  if (!line) throw new Error(`the server has no product line '${lineCode}'`);
+  const all = await r.json();
+  if (!all.length) throw new Error('the server has no product lines');
+  const line = all.find(l => l.code === lineCode) || all[0];
 
   let customer = null, customerError = null;
   if (customerKey) {
@@ -42,9 +50,11 @@ export async function connectPlanner(lineCode = 'DT', customerKey = null) {
   return {
     mode: 'server',
     customer, customerError,
+    lines: all.map(l => ({ code: l.code, name: l.name, manufacturer: l.manufacturer?.name })),
     manufacturer: line.manufacturer,
     line: { code: line.code, name: line.name },
-    elbowOffsets: line.elbow_offsets || [],
+    options: line.options || {},
+    elbowOffsets: forSize(line.elbow_offsets || []),
     outerIn: size => line.outer_in?.[String(size)],
     async plan(spec) {
       let res;
@@ -59,12 +69,20 @@ export async function connectPlanner(lineCode = 'DT', customerKey = null) {
 }
 
 async function browserPlanner(lineCode) {
-  const catalog = await loadCatalog('catalog', lineCode);
+  const index = await (await fetch('catalog/index.json')).json();
+  const codes = Object.keys(index.line_files || {});
+  if (!codes.length) throw new Error('the catalog has no product lines');
+  const code = codes.includes(lineCode) ? lineCode : codes[0];
+  const catalog = makeCatalog(index, await (await fetch(`catalog/${index.line_files[code]}`)).json());
+  const maker = c => (index.manufacturers || []).find(m => m.code === c)?.name;
   return {
     mode: 'browser',
+    lines: (index.product_lines || []).filter(l => codes.includes(l.code))
+      .map(l => ({ code: l.code, name: l.name, manufacturer: maker(l.manufacturer) })),
     manufacturer: catalog.manufacturer,
     line: { code: catalog.line.code, name: catalog.line.name },
-    elbowOffsets: catalog.lookups.elbow_offsets || [],
+    options: lineOptions(catalog, index),
+    elbowOffsets: forSize(catalog.lookups.elbow_offsets || []),
     outerIn: size => catalog.sizes.find(z => z.size === String(size))?.outer_in,
     plan: async spec => planChimney(spec, catalog),
   };
