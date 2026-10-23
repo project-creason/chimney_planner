@@ -108,6 +108,10 @@ test('admin API: password, preview, import that adds SKUs without wiping others,
     }).finally(() => server.close());
   };
   assert.equal((await call(createApp({ db, adminPassword: '' }), 'customers')).status, 503);
+  const health = async app => { const server = createServer(app).listen(0);
+    try { return await (await fetch(`http://localhost:${server.address().port}/api/health`)).json(); } finally { server.close(); } };
+  assert.equal((await health(createApp({ db, adminPassword: '' }))).admin_pages, false);
+  assert.equal((await health(createApp({ db, adminPassword: 'x' }))).admin_pages, true);
   const app = createApp({ db, adminPassword: 'secret-pass' });
   assert.equal((await call(app, 'customers', { pass: 'wrong' })).status, 401);
 

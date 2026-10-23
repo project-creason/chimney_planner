@@ -2,7 +2,7 @@
  * HTTP API for the planner. The catalog and rules stay on the server; the browser sends answers
  * and gets back the parts list.
  *
- *   GET  /api/health
+ *   GET  /api/health                { ok, admin_pages: is ADMIN_PASSWORD set, commit: the build's git commit on Vercel }
  *   GET  /api/lines                 active product lines with manufacturer name, logo, sizes, finishes and the
  *                                   elbow offset chart (the form offers only the shifts the chart makes)
  *   POST /api/plan   { spec }       -> { manufacturer, line, plan }   (spec = ChimneySpec, see web/js/engine/spec.js)
@@ -76,7 +76,9 @@ export function createApp({ db, allowedOrigin = process.env.ALLOWED_ORIGIN || '*
   };
 
   const routes = {
-    'GET /api/health': async () => ({ ok: true }),
+    // whether the admin pages are on (never the password itself) and which build answered, for checking a deploy
+    'GET /api/health': async () => ({ ok: true, admin_pages: !!adminPassword,
+      commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null }),
 
     'GET /api/lines': async () => {
       const { lines } = await load();
