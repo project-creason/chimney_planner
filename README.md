@@ -1,4 +1,4 @@
-# Chimney Planner
+# Chimney Venting Planner
 
 Enter details about a home and a wood stove or factory-built fireplace, and get a complete chimney parts list
 that follows the chimney maker's instructions and NFPA 211. Two product lines are loaded: Duravent DuraTech and
