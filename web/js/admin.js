@@ -213,12 +213,23 @@ function sheetRows() {
   return out;
 }
 
+/**
+ * A new customer's short internal ID, made from its name (Acme Hearth Supply -> ACMEHEARTH): the database key and
+ * the order file name. Never typed or shown; a number is added when the ID is already taken.
+ */
+function newCode() {
+  const base = ($('#newName').value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16) || 'CUSTOMER').padEnd(2, 'X');
+  let code = base;
+  for (let i = 2; customers.some(x => x.code === code); i++) code = `${base}${i}`;
+  return code;
+}
+
 function request(commit) {
   const c = currentCustomer();
   const headers = sheets[sheetIdx].rows[headerIdx] || [];
   return {
     commit,
-    customer: c ? { code: c.code } : { code: $('#newCode').value.trim().toUpperCase(), name: $('#newName').value.trim(), vertical: $('#newVertical').value },
+    customer: c ? { code: c.code } : { code: newCode(), name: $('#newName').value.trim(), vertical: $('#newVertical').value },
     price_list: { name: $('#listName').value.trim(), currency: $('#currency').value.trim().toUpperCase(),
       effective_from: $('#from').value || null, effective_to: $('#to').value || null },
     strip_prefix: $('#stripPrefix').value.trim(),
@@ -320,9 +331,8 @@ function updateImportButton() {
   const c = currentCustomer(), r = lastPreview;
   const problems = [];
   if (!r || !r.matched) problems.push('no rows match the catalog yet');
-  if (!c && !/^[A-Z0-9][A-Z0-9_-]{1,19}$/.test($('#newCode').value.trim().toUpperCase())) problems.push('give the new customer a code');
-  if (!c && customers.some(x => x.code === $('#newCode').value.trim().toUpperCase())) problems.push('that code is already a customer: pick it above');
   if (!c && !$('#newName').value.trim()) problems.push('give the new customer a name');
+  if (!c && customers.some(x => x.name.toLowerCase() === $('#newName').value.trim().toLowerCase())) problems.push('a customer with that name exists: pick it above');
   if (cols.price !== null && !$('#listName').value.trim()) problems.push('name the price list');
   const replacing = c?.price_lists.find(l => l.name === $('#listName').value.trim());
   $('#import').disabled = problems.length > 0;
@@ -335,12 +345,14 @@ async function runImport() {
   btn.disabled = true;
   btn.textContent = 'Importing…';
   try {
-    const r = await api('price-import', request(true));
-    const code = request(false).customer.code;
+    const sent = request(true);
+    const r = await api('price-import', sent);
+    const code = sent.customer.code;
+    const name = sent.customer.name || currentCustomer()?.name || code;
     const link = r.saved.key ? `${location.origin}${location.pathname.replace(/admin\.html$/, '')}?customer=${r.saved.key}` : null;
-    $('#result').innerHTML = `<div class="banner ok"><p><strong>Imported.</strong> ${r.saved.prices} prices and ${r.saved.skus} customer part numbers saved for ${esc(code)}.
+    $('#result').innerHTML = `<div class="banner ok"><p><strong>Imported.</strong> ${r.saved.prices} prices and ${r.saved.skus} customer part numbers saved for ${esc(name)}.
       The column choices are remembered for this customer's next sheet.</p>
-      ${link ? `<p style="margin-top:8px"><b>${esc(code)}'s private planner link.</b> It is shown only this once: copy it now and send it to them privately.</p>
+      ${link ? `<p style="margin-top:8px"><b>${esc(name)}'s private planner link.</b> It is shown only this once: copy it now and send it to them privately.</p>
         <div class="link"><code id="newLink">${esc(link)}</code><button class="btn" type="button" id="copyLink">Copy</button></div>` : ''}</div>`;
     $('#copyLink')?.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(link); $('#copyLink').textContent = 'Copied'; }
@@ -372,7 +384,7 @@ $('#sheet').addEventListener('change', sheetChanged);
 $('#headerRow').addEventListener('change', headerChanged);
 $('#stripPrefix').addEventListener('input', schedulePreview);
 $('#import').addEventListener('click', runImport);
-for (const id of ['#newCode', '#newName', '#listName', '#currency', '#from', '#to']) $(id).addEventListener('input', updateImportButton);
+for (const id of ['#newName', '#listName', '#currency', '#from', '#to']) $(id).addEventListener('input', updateImportButton);
 let saved = '';
 try { saved = sessionStorage.getItem(PASS_KEY) || ''; } catch { /* private window */ }
 if (saved) signIn(saved);
