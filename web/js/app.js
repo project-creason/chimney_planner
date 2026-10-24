@@ -1,6 +1,6 @@
 /**
  * Questionnaire page: binds the form to a plain state object, converts it with toSpec(),
- * asks for a plan on every change (from the server, or the engine in the browser: see planner-source.js),
+ * asks the planning server for a plan on every change (see planner-source.js),
  * and renders the results sheet.
  */
 import { offsetChoices } from './engine/geometry.js';
@@ -516,11 +516,9 @@ function update() {
     render(result, spec);
   };
   clearTimeout(planTimer);
-  if (planner.mode === 'server') {
-    // wait for a pause in typing, then ask once
-    $('#results').setAttribute('aria-busy', 'true');
-    planTimer = setTimeout(run, 250);
-  } else run();
+  // wait for a pause in typing, then ask once
+  $('#results').setAttribute('aria-busy', 'true');
+  planTimer = setTimeout(run, 250);
 }
 
 const ICON = {
@@ -633,7 +631,7 @@ function render(r, spec) {
         <p class="fig-tip" id="fig-tip-${i}" role="tooltip">${esc(f.note)}</p>
       </div>`).join('');
     $('#maker').innerHTML = `Parts from <b>${esc(makerName())}</b>, ${esc(planner.line.name)} line` +
-      ` <span class="source">· worked out ${planner.mode === 'server' ? 'by the planning server' : 'in this browser'}</span>`;
+      ' <span class="source">· worked out by the planning server</span>';
     $('#governing').innerHTML = `Height set by <b>${esc(g.governingRule)}</b>: at least ${fmtFtIn(g.requiredTopIn, true)} above the floor.`;
     const offs = g.offsets || [];
     $('#offsetInfo').hidden = !offs.length;
@@ -864,7 +862,6 @@ async function switchLine(code) {
 async function connect(code) {
   const p = await connectPlanner(code, customerKey);
   planner = p;
-  document.documentElement.dataset.planner = p.mode;
   applyLineOptions();
   snapOffsets();
   for (const box of form.querySelectorAll('[data-kind="offset"]')) renderList(box);

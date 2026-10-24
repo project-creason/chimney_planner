@@ -9,7 +9,7 @@ import { planChimney } from '../web/js/engine/planner.js';
 import { SCENARIOS, goldenFile, specFor } from '../tests/fixtures/scenarios.mjs';
 
 const line = process.argv[2] || 'DT';
-const load = f => JSON.parse(readFileSync(new URL(`../web/catalog/${f}`, import.meta.url)));
+const load = f => JSON.parse(readFileSync(new URL(`../build/catalog/${f}`, import.meta.url)));
 const cat = makeCatalog(load('index.json'), load(`${line}.json`));
 const out = SCENARIOS.map(([name, spec]) => {
   let result;

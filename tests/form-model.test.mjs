@@ -6,7 +6,7 @@ import { planChimney } from '../web/js/engine/planner.js';
 import { EXAMPLE_RANCH } from '../web/js/engine/spec.js';
 import { EXAMPLE_STATE, blankState, toSpec, toInches, fmtFtIn, passesThroughRoof } from '../web/js/ui/form-model.js';
 
-const load = f => JSON.parse(readFileSync(new URL(`../web/catalog/${f}`, import.meta.url)));
+const load = f => JSON.parse(readFileSync(new URL(`../build/catalog/${f}`, import.meta.url)));
 const cat = makeCatalog(load('index.json'), load('DT.json'));
 const clone = o => structuredClone(o);
 
