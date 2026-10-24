@@ -8,7 +8,7 @@ import { selectPipe, pipeStock, terminationHeight } from '../web/js/engine/geome
 import { EXAMPLE_RANCH, EXAMPLE_THROUGH_WALL, EXAMPLE_CHASE_FIREPLACE } from '../web/js/engine/spec.js';
 import { BOSTON_1200, BOSTON_HEIGHTS_FT } from './fixtures/boston-1200.mjs';
 
-const load = f => JSON.parse(readFileSync(new URL(`../web/catalog/${f}`, import.meta.url)));
+const load = f => JSON.parse(readFileSync(new URL(`../build/catalog/${f}`, import.meta.url)));
 const cat = makeCatalog(load('index.json'), load('DT.json'));
 const qty = (res, order) => res.parts.find(p => p.order_number === order)?.qty ?? 0;
 const pipes = res => res.parts.filter(p => p.category === 'CHIMNEY_PIPE');

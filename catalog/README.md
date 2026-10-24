@@ -1,10 +1,11 @@
 # Chimney Planner — Catalog
 
-The CSV files in `catalog/` are the **source of truth**. The website never reads them
-directly; it reads the JSON that `tools/build_catalog.py` generates in `web/catalog/`.
+The CSV files in `catalog/` are the **source of truth**. Nothing reads them
+directly: `tools/build_catalog.py` checks them and generates JSON in `build/catalog/`, which the database import
+and the tests read. The site gets the catalog from the database through the planning server.
 
 ```
-edit CSVs (Excel is fine)  →  python tools/build_catalog.py  →  commit CSVs + web/catalog/
+edit CSVs (Excel is fine)  →  python tools/build_catalog.py  →  npm run db:import  →  commit CSVs + build/catalog/
 ```
 
 If the build reports an error, nothing is written. Fix the `file:row` it names and rerun.

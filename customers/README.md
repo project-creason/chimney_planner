@@ -63,5 +63,4 @@ The customer's link is the site address with `?customer=<key>`, for example
 `https://<your-site>/?customer=Ab3...`. Anyone with the link sees that customer's SKUs and prices, so send it
 privately. If it leaks, import again with `--new-key`.
 
-Customer pricing needs the planning server (the Vercel site). The GitHub Pages copy plans in the browser and
-has no customer data.
+Customer pricing comes from the planning server (the Vercel site), the only place customer data is kept.

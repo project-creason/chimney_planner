@@ -8,7 +8,7 @@ import { planChimney } from '../web/js/engine/planner.js';
 import { EXAMPLE_RANCH, EXAMPLE_THROUGH_WALL, EXAMPLE_CHASE_FIREPLACE } from '../web/js/engine/spec.js';
 import { SCENARIOS } from './fixtures/scenarios.mjs';
 
-const load = f => JSON.parse(readFileSync(new URL(`../web/catalog/${f}`, import.meta.url)));
+const load = f => JSON.parse(readFileSync(new URL(`../build/catalog/${f}`, import.meta.url)));
 const index = load('index.json');
 const cat = makeCatalog(index, load('XL.json'));
 const qty = (res, order) => res.parts.find(p => p.order_number === order)?.qty ?? 0;

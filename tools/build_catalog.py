@@ -1,13 +1,13 @@
 """
-Validate the CSV catalog and compile it to JSON for the website.
+Validate the CSV catalog and compile it to JSON for the database import and the tests.
 
-    python tools/build_catalog.py            # validate + write dist/catalog/
+    python tools/build_catalog.py            # validate + write build/catalog/
     python tools/build_catalog.py --check    # validate only
     python tools/build_catalog.py --catalog DIR --out DIR   # another catalog folder (used by the export round trip)
 
 Source of truth:  catalog/shared/*.csv  and  catalog/lines/<LINE>/*.csv
-Output:           web/catalog/index.json   (lines, categories, rules, attribute defs, compatibility)
-                  dist/catalog/<LINE>.json  (sizes, parts, lookup tables) - one per ACTIVE line
+Output:           build/catalog/index.json (lines, categories, rules, attribute defs, compatibility)
+                  build/catalog/<LINE>.json (sizes, parts, lookup tables) - one per ACTIVE line
 
 Errors stop the build and are reported as  file:row  so they can be fixed in Excel.
 Warnings are printed but do not stop the build.
@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CAT = ROOT / "catalog"
-OUT = ROOT / "web" / "catalog"
+OUT = ROOT / "build" / "catalog"
 
 
 def _arg(name):

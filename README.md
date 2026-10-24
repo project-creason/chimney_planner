@@ -5,17 +5,16 @@ that follows the chimney maker's instructions and NFPA 211. Two product lines ar
 ICC EXCEL (both 5"–8"); the page has a picker to switch between them. Adding a line is data only: see
 `catalog/README.md`.
 
-The same page runs two ways. Where it is served with the planner API (on Vercel), every plan is worked out by the
-server from the database (SQLite, hosted on Turso). Where there is no API (GitHub Pages, a plain static server), it
-loads the catalog as JSON and runs the engine in the browser. Both use the same planner engine and must give identical
-plans; the results say which one made the plan ("worked out by the planning server" or "in this browser").
+The site is hosted on Vercel. The page sends each set of answers to the planner API, and the server works out the
+plan from the database (SQLite, hosted on Turso).
 
 ## Folders
 
 | Folder | What it holds |
 |---|---|
 | `catalog/` | The editable source: each product line's parts and rules as CSV files. See `catalog/README.md`. |
-| `tools/build_catalog.py` | Checks the CSVs and builds `web/catalog/*.json`. Python 3, standard library only. |
+| `tools/build_catalog.py` | Checks the CSVs and builds `build/catalog/*.json`, which the database import and the tests read. Python 3, standard library only. |
+| `build/catalog/` | The JSON the catalog build writes. Generated: rebuild it, don't edit it. |
 | `web/` | The website itself. This folder is what gets hosted. |
 | `customers/` | Retailers' and distributors' own part numbers and prices. Only the made-up `DEMO` is committed. See `customers/README.md`. |
 | `server/` | The API and database: `schema.sql`, CSV import and export, customer pricing, and the HTTP server. |
@@ -37,10 +36,10 @@ npm run server          # API on http://localhost:8787 (POST /api/plan, GET /api
 npm run dev             # site + API together on http://localhost:3000, as Vercel serves them
 npm run check:api -- URL   # send every line's recorded scenarios to a running API and compare
 node tools/make_golden.mjs [LINE]   # re-record a line's 282 plans (default DT), only when they are meant to change
-cd web && python3 -m http.server 8000   # try it at http://localhost:8000
 ```
 
-Opening `web/index.html` by double-clicking won't work: the browser blocks it from loading its own files from disk.
+The page needs the API next to it, so try it with `npm run dev`; opening `web/index.html` from disk or from a plain
+static server shows "the planning server could not be reached".
 
 ## Database (Turso)
 
@@ -51,7 +50,7 @@ the catalog and rules as a whole; customer tables (part numbers, prices, stricte
 Distributors' price sheets, in whatever layout they come, are loaded on `/admin.html` (needs `ADMIN_PASSWORD`
 set on the server; see `customers/README.md`). A customer's private link, `/?customer=<key>`, shows the plan with their SKUs, prices and a subtotal, and adds a
 "Download order" button (a CSV with SKU, manufacturer part number, quantity, unit price and line total). Only the
-server has customer data, so the GitHub Pages copy shows no prices.
+server has customer data.
 
 ## Hosting
 
@@ -61,11 +60,4 @@ In Vercel choose **Add New → Project**, import this repository and leave the b
 enough; the site never writes), then redeploy. Every push to a pull request's branch after the import gets its own preview address
 (open it from **Deployments**); the production address shows `main`.
 
-The `web/` folder on its own is a static site and works on any static host (GitHub Pages, Netlify, Cloudflare
-Pages); there it plans in the browser.
-
-**GitHub Pages:** in this repository go to **Settings → Pages → Build and deployment** and set **Source** to
-**GitHub Actions**. Every push to `main` then rebuilds the catalog, runs the tests, and publishes `web/`.
-Pages on a private repository needs a paid GitHub plan; on a free plan, make the repository public or use Netlify.
-
-**Google Sites:** host the site first, then in Google Sites use **Insert → Embed → By URL** with the site's address.
+**Google Sites:** in Google Sites use **Insert → Embed → By URL** with the Vercel site's address.

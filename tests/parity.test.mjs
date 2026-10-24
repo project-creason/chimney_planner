@@ -6,7 +6,7 @@ import { makeCatalog } from '../web/js/engine/catalog.js';
 import { planChimney } from '../web/js/engine/planner.js';
 import { SCENARIOS, GOLDEN_LINES, goldenFile, specFor } from './fixtures/scenarios.mjs';
 
-const load = f => JSON.parse(readFileSync(new URL(`../web/catalog/${f}`, import.meta.url)));
+const load = f => JSON.parse(readFileSync(new URL(`../build/catalog/${f}`, import.meta.url)));
 const golden = line => JSON.parse(readFileSync(new URL(`./fixtures/${goldenFile(line)}`, import.meta.url)));
 
 /** The plan as plain JSON, or the error it threw, so it compares with the recorded file. */

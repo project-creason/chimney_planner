@@ -1,7 +1,9 @@
-# Runs every test, including the database and API, on pull requests.
+# Runs every test, including the database and API, on pull requests and on main.
 name: Tests
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
